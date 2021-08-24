@@ -1,3 +1,7 @@
 *.pyc
 *.jar
 *.tokens
+build/
+dist/
+*.egg-info/
+
