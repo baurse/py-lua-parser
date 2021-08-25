@@ -351,6 +351,7 @@ class Builder:
         self._stream.LT(1)
         self.handle_hidden_left()
         comments = self.get_comments_followed_by_blank_line()
+        # test = self.get_comments()
         block = self.parse_block()
         if block:
             token = self._stream.LT(1)

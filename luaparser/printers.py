@@ -242,7 +242,8 @@ class LuaOutputVisitor:
 
     @visitor(Chunk)
     def visit(self, node) -> str:
-        return self.visit(node.body)
+        return self.visit(node.comments) + "\n\n" + self.visit(node.body)
+        # return self.visit(node.body)
 
     @visitor(Block)
     def visit(self, node: Block) -> str:
@@ -514,3 +515,8 @@ class LuaOutputVisitor:
     @visitor(SemiColon)
     def visit(self, node) -> str:
         return ';'
+
+    @visitor(Comment)
+    def visit(self, node: Comment) -> str:
+        meh = 1
+        return node.s
