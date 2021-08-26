@@ -247,20 +247,27 @@ class LuaOutputVisitor:
 
     @visitor(Chunk)
     def visit(self, node) -> str:
-        return "\n".join(filter(None, (self.visit(node.comments), self.visit(node.body))))
+        return "\n".join(filter(None, (self.visit(node.comments), self.visit(node.body)))) + "\n"
         # return self.visit(node.body)
 
     @visitor(Block)
     def visit(self, node: Block) -> str:
         self._up()
-        output = indent('\n'.join([self.visit(n) for n in node.body]), ' ' * self._curr_indent)
+        output = []
+        for n in node.body:
+            comment = self.visit(n.comments)
+            if comment != (None or ''): output.append(comment)
+            output.append(self.visit(n))
+        output = '\n'.join(output)
+        output = indent(output, ' ' * self._curr_indent)
+        # output = indent('\n'.join([self.visit(n) for n in node.body]), ' ' * self._curr_indent)
         self._down()
         return output
 
     @visitor(Assign)
     def visit(self, node: Assign) -> str:
-        return "\n".join(filter(None, (self.visit(node.comments), self.visit(node.targets)))) + ' = ' + self.visit(node.values)
-        # return self.visit(node.targets)) + ' = ' + self.visit(node.values)
+        # return "\n".join(filter(None, (self.visit(node.comments), self.visit(node.targets)))) + ' = ' + self.visit(node.values)
+        return self.visit(node.targets) + ' = ' + self.visit(node.values)
 
     @visitor(LocalAssign)
     def visit(self, node: LocalAssign) -> str:

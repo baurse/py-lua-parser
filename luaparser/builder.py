@@ -350,7 +350,10 @@ class Builder:
     def parse_chunk(self) -> Chunk or None:
         self._stream.LT(1)
         self.handle_hidden_left()
-        comments = self.get_comments_followed_by_blank_line()
+        # self._hidden_handled = False
+        # self.handle_hidden_right()
+        # comments = self.get_comments_followed_by_blank_line()
+        comments = self.get_comments() # Getting all comments here allows us to have multi-line comments at the file/chunk beginning
         block = self.parse_block()
         if block:
             token = self._stream.LT(1)
@@ -375,7 +378,7 @@ class Builder:
         return Block(statements)
 
     def parse_stat(self) -> Statement or None:
-        comments = self.get_comments()
+        comments = self.get_comments() # getting the comments here will ignore comments written in the same line as the statement
 
         stat = \
             self.parse_assignment() or \
@@ -388,6 +391,8 @@ class Builder:
             self.parse_for_stat() or \
             self.parse_function() or \
             self.parse_label()
+
+        # comments = self.get_comments() # getting the comments here does add the comments in the same line to the correct statement
 
         if stat:
             stat.comments = comments
