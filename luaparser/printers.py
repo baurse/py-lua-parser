@@ -247,7 +247,7 @@ class LuaOutputVisitor:
 
     @visitor(Chunk)
     def visit(self, node) -> str:
-        return "\n".join(filter(None, (self.visit(node.comments), self.visit(node.body)))) + "\n"
+        return "\n".join(filter(None, (self.visit(node.comments), self.visit(node.body))))
         # return self.visit(node.body)
 
     @visitor(Block)
