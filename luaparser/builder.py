@@ -350,10 +350,8 @@ class Builder:
     def parse_chunk(self) -> Chunk or None:
         self._stream.LT(1)
         self.handle_hidden_left()
-        # self._hidden_handled = False
-        # self.handle_hidden_right()
-        # comments = self.get_comments_followed_by_blank_line()
-        comments = self.get_comments() # Getting all comments here allows us to have multi-line comments at the file/chunk beginning
+        comments = self.get_comments_followed_by_blank_line()
+        # comments = self.get_comments() # Getting all comments here allows us to have multi-line comments at the file/chunk beginning -> Not true/needed actually lol
         block = self.parse_block()
         if block:
             token = self._stream.LT(1)
