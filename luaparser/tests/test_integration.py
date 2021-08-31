@@ -86,7 +86,7 @@ class IntegrationTestCase(tests.TestCase):
         '''))
         pretty_str = ast.to_pretty_str(tree)
         exp = textwrap.dedent(r'''
-        Chunk: {} 4 keys
+        Chunk: {} 5 keys
           body: {} 4 keys
             Block: {} 4 keys
               body: [] 2 items

@@ -86,9 +86,12 @@ class Chunk(Node):
         body (`Block`): Chunk body.
     """
 
-    def __init__(self, body: Block, comments: Comments = None):
+    def __init__(self, body: Block, comments: Comments = None, trailing_comments: Comments = None):
         super(Chunk, self).__init__('Chunk', comments)
+        if trailing_comments is None:
+            trailing_comments = []
         self.body = body
+        self.trailing_comments: List[str] = trailing_comments
 
 
 '''

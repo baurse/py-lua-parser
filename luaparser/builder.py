@@ -353,11 +353,15 @@ class Builder:
         comments = self.get_comments_followed_by_blank_line()
         # comments = self.get_comments() # Getting all comments here allows us to have multi-line comments at the file/chunk beginning -> Not true/needed actually lol
         block = self.parse_block()
+        # hacky(?) way to save trailing comments after a chunk, like at the end of a file
+        self._hidden_handled = False
+        self.handle_hidden_right()
+        trailing_comments = self.get_comments()
         if block:
             token = self._stream.LT(1)
             if token.type == -1:
                 # do not consume EOF
-                return Chunk(block, comments)
+                return Chunk(block, comments, trailing_comments)
         return False
 
     def parse_block(self) -> Block:

@@ -116,3 +116,35 @@ class CommentsTestCase(tests.TestCase):
             Comment('--- @module utils')
         ])
         self.assertEqual(exp, tree)
+
+    def test_comment_after_global_assign_at_chunk_end(self):
+        tree = ast.parse(textwrap.dedent("""
+            rate_limit = 192
+            -- the above specifies the rate limit
+            """))
+        exp = Chunk(Block([
+            Assign(
+                [Name('rate_limit')],
+                [Number(192)]
+            )
+        ]),
+        None,
+        [Comment('-- the above specifies the rate limit')])
+        self.assertEqual(exp, tree)
+
+    def test_comment_before_and_after_global_assign_at_chunk_end(self):
+        tree = ast.parse(textwrap.dedent("""
+            -- the below is a rate limit
+            rate_limit = 192
+            -- the above specifies is a rate limit
+            """))
+        exp = Chunk(Block([
+            Assign(
+                [Name('rate_limit')],
+                [Number(192)],
+                [Comment('-- the below is a rate limit')]
+            )
+        ]),
+        None,
+        [Comment('-- the above specifies is a rate limit')])
+        self.assertEqual(exp, tree)

@@ -104,7 +104,7 @@ class PythonStyleVisitor:
             self.dedent()
 
         for attr, attrValue in node.__dict__.items():
-            if not attr.startswith(('_', 'comments')):
+            if not attr.startswith(('_', 'comments', 'trailing_comments')):
                 if isinstance(attrValue, Node) or isinstance(attrValue, list):
                     res += self.indent_str() + attr + ': ' + self.pretty_count(attrValue)
                     self.indent()
@@ -113,8 +113,22 @@ class PythonStyleVisitor:
                 else:
                     if attrValue is not None:
                         res += self.indent_str() + attr + ': ' + self.visit(attrValue)
+        
+        # trailing comments, like at the end of a file, can exist if the node is a chuck
+        if type(node) is Chunk:
+            trailing_comments = node.trailing_comments
+            if trailing_comments:
+                res += self.indent_str() + 'trailing_comments' + ': ' + self.pretty_count(trailing_comments)
+                k = 0
+                self.indent()
+                for c in trailing_comments:
+                    res += self.indent_str() + str(k) + ': ' + self.visit(c.s)
+                    k += 1
+                self.dedent()
+
         self.dedent()
         return res
+
 
 
 escape_dict = {
@@ -247,7 +261,7 @@ class LuaOutputVisitor:
 
     @visitor(Chunk)
     def visit(self, node) -> str:
-        return "\n".join(filter(None, (self.visit(node.comments), self.visit(node.body))))
+        return "\n".join(filter(None, (self.visit(node.comments), self.visit(node.body), self.visit(node.trailing_comments))))
         # return self.visit(node.body)
 
     @visitor(Block)
