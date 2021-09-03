@@ -317,8 +317,10 @@ COMMENT
     : '--[' NESTED_STR ']' -> channel(HIDDEN)
     ;
 
+// The #** is actually the FAF BOM, not just a comment, 
+// but implementing it like this suffices for now. TODO
 LINE_COMMENT
-    : '--'
+    : ('--' | '#**') 
     (                                               // --
     | '[' '='*                                      // --[==
     | '[' '='* ~('='|'['|'\r'|'\n') ~('\r'|'\n')*   // --[==AA
