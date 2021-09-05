@@ -247,6 +247,17 @@ class ExpressionsTestCase(tests.TestCase):
         )]))
         self.assertEqual(exp, tree)
 
+    def test_not_equal_than_2(self):
+        tree = ast.parse(r'res = 1 != 2')
+        exp = Chunk(Block([Assign(
+            targets=[Name('res')],
+            values=[NotEqToOp(
+                left=Number(1),
+                right=Number(2)
+            )]
+        )]))
+        self.assertEqual(exp, tree)
+
     """
     3.4.5 – Logical Operators
     """
