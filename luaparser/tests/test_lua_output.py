@@ -41,6 +41,13 @@ class LuaOutputTestCase(tests.TestCase):
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_if_without_else(self):
+        source = textwrap.dedent('''\
+            if op == "+" then
+                r = a + b
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
     def test_goto(self):
         source = textwrap.dedent('''\
             ::label::
