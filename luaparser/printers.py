@@ -273,7 +273,9 @@ class LuaOutputVisitor:
             if comment != (None or ''): output.append(comment)
             output.append(self.visit(n))
         output = '\n'.join(output)
-        output = indent(output, ' ' * self._curr_indent)
+        # output = indent(output, ' ' * self._curr_indent)
+        if self._curr_indent != 0:
+            output = indent(output, ' ' * self._indent_size)
         # output = indent('\n'.join([self.visit(n) for n in node.body]), ' ' * self._curr_indent)
         self._down()
         return output
