@@ -300,11 +300,12 @@ class LuaOutputVisitor:
     @visitor(If)
     def visit(self, node: If) -> str:
         output = 'if ' + self.visit(node.test) + ' then\n' + self.visit(node.body) + '\n'
-        if isinstance(node.orelse, ElseIf):
-            output += self.visit(node.orelse)
-        else:
-            output += 'else\n' + self.visit(node.orelse)
-        output += '\nend'
+        if node.orelse:
+            if isinstance(node.orelse, ElseIf):
+                output += self.visit(node.orelse) + '\n'
+            else:
+                output += 'else\n' + self.visit(node.orelse) + '\n'
+        output += 'end'
         return output
 
     @visitor(ElseIf)
@@ -361,13 +362,33 @@ class LuaOutputVisitor:
 
     @visitor(Function)
     def visit(self, node: Function) -> str:
-        return 'function ' + self.visit(node.name) + '(' + self.visit(node.args) + ')\n' + self.visit(
-            node.body) + '\nend'
+        output = 'function ' + self.visit(node.name) + '(' + self.visit(node.args) + ')'
+        body_visit_out = self.visit(node.body)
+        if body_visit_out != '': 
+            output += '\n' + body_visit_out + '\n' + 'end'
+        else: 
+            output += ' end'
+        return output
 
     @visitor(LocalFunction)
     def visit(self, node) -> str:
-        return 'local function ' + self.visit(node.name) + '(' + self.visit(node.args) + ')\n' + self.visit(
-            node.body) + '\nend'
+        output = 'local function ' + self.visit(node.name) + '(' + self.visit(node.args) + ')'
+        body_visit_out = self.visit(node.body)
+        if body_visit_out != '': 
+            output += '\n' + body_visit_out + '\n' + 'end'
+        else: 
+            output += ' end'
+        return output
+    
+    @visitor(AnonymousFunction)
+    def visit(self, node: AnonymousFunction) -> str:
+        output = 'function' + '(' + self.visit(node.args) + ')'
+        body_visit_out = self.visit(node.body)
+        if body_visit_out != '': 
+            output += '\n' + body_visit_out + '\n' + 'end'
+        else: 
+            output += ' end'
+        return output
 
     @visitor(Method)
     def visit(self, node: Method) -> str:
@@ -403,28 +424,30 @@ class LuaOutputVisitor:
     def visit(self, node: Table):
         output = '{\n'
         self._up()
+        field_index = 1 # Lua starts counting at 1 :(
         for field in node.fields:
-            output += indent(self.visit(field) + ',\n', ' ' * self._curr_indent)
+            output += indent(self.visit(field, field_index) + ',\n', ' ' * self._curr_indent)
+            field_index += 1
         self._down()
         output += '}'
         return output
 
     @visitor(Field)
-    def visit(self, node: Field):
-        output = '[' if node.between_brackets else ''
-        output += self.visit(node.key)
-        output += ']' if node.between_brackets else ''
-        output += ' = '
+    def visit(self, node: Field, field_index: int or None = None):
+        key_visit_out = self.visit(node.key)
+        output = ''
+        # If the table is actually an array we don't need to print the key as it's redundant.
+        if not (field_index and key_visit_out == str(field_index)):
+            output = '[' if node.between_brackets else ''
+            output += self.visit(node.key)
+            output += ']' if node.between_brackets else ''
+            output += ' = '
         output += self.visit(node.value)
         return output
 
     @visitor(Dots)
     def visit(self, node) -> str:
         return '...'
-
-    @visitor(AnonymousFunction)
-    def visit(self, node: AnonymousFunction) -> str:
-        return 'function(' + self.visit(node.args) + ')\n' + self.visit(node.body) + '\nend'
 
     @visitor(AddOp)
     def visit(self, node) -> str:

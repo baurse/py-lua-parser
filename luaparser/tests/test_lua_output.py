@@ -50,6 +50,13 @@ class LuaOutputTestCase(tests.TestCase):
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_if_without_else(self):
+        source = textwrap.dedent('''\
+            if op == "+" then
+                r = a + b
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
     def test_goto(self):
         source = textwrap.dedent('''\
             ::label::
@@ -64,8 +71,35 @@ class LuaOutputTestCase(tests.TestCase):
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_empty_func(self):
+        source = textwrap.dedent('''\
+            function nop(arg, ...) end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_local_func(self):
+        source = textwrap.dedent('''\
+            local function nop(arg, ...)
+                break
+                return 1, 2, 3
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_local_empty_func(self):
+        source = textwrap.dedent('''\
+            local function nop(arg, ...) end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_anonymous_func(self):
+        source = textwrap.dedent('''\
+            ano = function()
+                nop()
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_empty_anonymous_func(self):
+        source = textwrap.dedent('''\
+            func = function() end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
     def test_for_num(self):
         source = textwrap.dedent('''\
@@ -78,6 +112,17 @@ class LuaOutputTestCase(tests.TestCase):
         source = textwrap.dedent('''\
             for key, value in pairs(t) do
                 print(key, value)
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_successive_indents(self):
+        source = textwrap.dedent('''\
+            for i = 1, 10 do
+                for j = 1, 10 do
+                    for k = 1, 10 do
+                        print(i * j * k)
+                    end
+                end
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
@@ -94,17 +139,18 @@ class LuaOutputTestCase(tests.TestCase):
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
-    def test_anonymous_func(self):
-        source = textwrap.dedent('''\
-            local ano = function()
-                nop()
-            end''')
-        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
-
     def test_table(self):
         source = textwrap.dedent('''\
             local table = {
                 ['ok'] = true,
                 foo = bar,
+            }''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_table_as_array(self):
+        source = textwrap.dedent('''\
+            local table = {
+                true,
+                bar,
             }''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
