@@ -22,11 +22,11 @@ _methods = {}
 
 
 # Delegating visitor implementation
-def _visitor_impl(self, arg):
+def _visitor_impl(self, arg, *args, **kwargs):
     """Actual visitor method implementation."""
     if (_qualname(type(self)), type(arg)) in _methods:
         method = _methods[(_qualname(type(self)), type(arg))]
-        return method(self, arg)
+        return method(self, arg, *args, **kwargs)
     else:
         # if no visitor method found for this arg type,
         # search in parent arg type:
@@ -34,7 +34,7 @@ def _visitor_impl(self, arg):
         while arg_parent_type != object:
             if (_qualname(type(self)), arg_parent_type) in _methods:
                 method = _methods[(_qualname(type(self)), arg_parent_type)]
-                return method(self, arg)
+                return method(self, arg, *args, **kwargs)
             else:
                 arg_parent_type = arg_parent_type.__bases__[0]
     raise VisitorException('No visitor found for class ' + str(type(arg)))

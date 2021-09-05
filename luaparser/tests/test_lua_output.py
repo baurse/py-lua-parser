@@ -55,9 +55,6 @@ class LuaOutputTestCase(tests.TestCase):
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
-
-
-
     def test_for_num(self):
         source = textwrap.dedent('''\
             for i = 1, 10 do
@@ -69,6 +66,17 @@ class LuaOutputTestCase(tests.TestCase):
         source = textwrap.dedent('''\
             for key, value in pairs(t) do
                 print(key, value)
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_successive_indents(self):
+        source = textwrap.dedent('''\
+            for i = 1, 10 do
+                for j = 1, 10 do
+                    for k = 1, 10 do
+                        print(i * j * k)
+                    end
+                end
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
@@ -97,5 +105,13 @@ class LuaOutputTestCase(tests.TestCase):
             local table = {
                 ['ok'] = true,
                 foo = bar,
+            }''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_table_as_array(self):
+        source = textwrap.dedent('''\
+            local table = {
+                true,
+                bar,
             }''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
