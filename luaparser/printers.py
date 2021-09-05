@@ -358,13 +358,33 @@ class LuaOutputVisitor:
 
     @visitor(Function)
     def visit(self, node: Function) -> str:
-        return 'function ' + self.visit(node.name) + '(' + self.visit(node.args) + ')\n' + self.visit(
-            node.body) + '\nend'
+        output = 'function ' + self.visit(node.name) + '(' + self.visit(node.args) + ')'
+        body_visit_out = self.visit(node.body)
+        if body_visit_out != '': 
+            output += '\n' + body_visit_out + '\n' + 'end'
+        else: 
+            output += ' end'
+        return output
 
     @visitor(LocalFunction)
     def visit(self, node) -> str:
-        return 'local function ' + self.visit(node.name) + '(' + self.visit(node.args) + ')\n' + self.visit(
-            node.body) + '\nend'
+        output = 'local function ' + self.visit(node.name) + '(' + self.visit(node.args) + ')'
+        body_visit_out = self.visit(node.body)
+        if body_visit_out != '': 
+            output += '\n' + body_visit_out + '\n' + 'end'
+        else: 
+            output += ' end'
+        return output
+    
+    @visitor(AnonymousFunction)
+    def visit(self, node: AnonymousFunction) -> str:
+        output = 'function' + '(' + self.visit(node.args) + ')'
+        body_visit_out = self.visit(node.body)
+        if body_visit_out != '': 
+            output += '\n' + body_visit_out + '\n' + 'end'
+        else: 
+            output += ' end'
+        return output
 
     @visitor(Method)
     def visit(self, node: Method) -> str:
@@ -424,10 +444,6 @@ class LuaOutputVisitor:
     @visitor(Dots)
     def visit(self, node) -> str:
         return '...'
-
-    @visitor(AnonymousFunction)
-    def visit(self, node: AnonymousFunction) -> str:
-        return 'function(' + self.visit(node.args) + ')\n' + self.visit(node.body) + '\nend'
 
     @visitor(AddOp)
     def visit(self, node) -> str:

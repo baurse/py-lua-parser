@@ -62,6 +62,36 @@ class LuaOutputTestCase(tests.TestCase):
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_empty_func(self):
+        source = textwrap.dedent('''\
+            function nop(arg, ...) end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_local_func(self):
+        source = textwrap.dedent('''\
+            local function nop(arg, ...)
+                break
+                return 1, 2, 3
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_local_empty_func(self):
+        source = textwrap.dedent('''\
+            local function nop(arg, ...) end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_anonymous_func(self):
+        source = textwrap.dedent('''\
+            ano = function()
+                nop()
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_empty_anonymous_func(self):
+        source = textwrap.dedent('''\
+            func = function() end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
     def test_for_num(self):
         source = textwrap.dedent('''\
             for i = 1, 10 do
@@ -96,13 +126,6 @@ class LuaOutputTestCase(tests.TestCase):
     def test_method(self):
         source = textwrap.dedent('''\
             function my:method(arg1, ...)
-                nop()
-            end''')
-        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
-
-    def test_anonymous_func(self):
-        source = textwrap.dedent('''\
-            local ano = function()
                 nop()
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
