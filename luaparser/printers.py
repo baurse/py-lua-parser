@@ -516,10 +516,6 @@ class LuaOutputVisitor:
     def visit(self, node) -> str:
         return 'not ' + self.visit(node.operand)
 
-    @visitor(ULengthOP)
-    def visit(self, node) -> str:
-        return '#' + self.visit(node.operand)
-
     @visitor(Name)
     def visit(self, node: Name) -> str:
         return self.visit(node.id)

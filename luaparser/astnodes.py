@@ -914,16 +914,3 @@ class ULNotOp(UnaryOp):
 
     def __init__(self, operand: Expression):
         super(ULNotOp, self).__init__('ULNotOp', operand)
-
-
-''' ----------------------------------------------------------------------- '''
-''' 3.4.7 – The Length Operator                                             '''
-''' ----------------------------------------------------------------------- '''
-
-
-class ULengthOP(UnaryOp):
-    """Length operator.
-    """
-
-    def __init__(self, operand: Expression):
-        super(ULengthOP, self).__init__('ULengthOp', operand)

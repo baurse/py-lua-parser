@@ -41,7 +41,7 @@ class Tokens:
     FOR = 8
     FUNCTION = 9
     GOTO = 10
-    IFTOK = 11
+    IFTOK = 11  # Why was this changed from the antlr4 token 'IF' to 'IFTOK'?
     IN = 12
     LOCAL = 13
     NIL = 14
@@ -60,41 +60,40 @@ class Tokens:
     FLOOR = 27
     MOD = 28
     POW = 29
-    LENGTH = 30
-    EQ = 31
-    NEQ = 32
-    LTEQ = 33
-    GTEQ = 34
-    LT = 35
-    GT = 36
-    ASSIGN = 37
-    BITAND = 38
-    BITOR = 39
-    BITNOT = 40
-    BITRSHIFT = 41
-    BITRLEFT = 42
-    OPAR = 43
-    CPAR = 44
-    OBRACE = 45
-    CBRACE = 46
-    OBRACK = 47
-    CBRACK = 48
-    COLCOL = 49
-    COL = 50
-    COMMA = 51
-    VARARGS = 52
-    CONCAT = 53
-    DOT = 54
-    SEMCOL = 55
-    NAME = 56
-    NUMBER = 57
-    STRING = 58
-    COMMENT = 59
-    LINE_COMMENT = 60
-    SPACE = 61
-    NEWLINE = 62
-    SHEBANG = 63
-    LongBracket = 64
+    EQ=30
+    NEQ=31
+    LTEQ=32
+    GTEQ=33
+    LT=34
+    GT=35
+    ASSIGN=36
+    BITAND=37
+    BITOR=38
+    BITNOT=39
+    BITRSHIFT=40
+    BITRLEFT=41
+    OPAR=42
+    CPAR=43
+    OBRACE=44
+    CBRACE=45
+    OBRACK=46
+    CBRACK=47
+    COLCOL=48
+    COL=49
+    COMMA=50
+    VARARGS=51
+    CONCAT=52
+    DOT=53
+    SEMCOL=54
+    NAME=55
+    NUMBER=56
+    STRING=57
+    COMMENT=58
+    LINE_COMMENT=59
+    SPACE=60
+    NEWLINE=61
+    SHEBANG=62
+    LongBracket=63
 
 
 LITERAL_NAMES = ["<INVALID>",
@@ -1114,13 +1113,6 @@ class Builder:
             if expr:
                 self.success()
                 return UMinusOp(expr)
-
-        self.failure_save()
-        if self.next_is_rc(Tokens.LENGTH):
-            expr = self.parse_pow_expr()
-            if expr:
-                self.success()
-                return ULengthOP(expr)
 
         self.failure_save()
         if self.next_is_rc(Tokens.NOT):

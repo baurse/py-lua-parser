@@ -307,17 +307,18 @@ class ExpressionsTestCase(tests.TestCase):
         )]))
         self.assertEqual(exp, tree)
 
-    ''' ----------------------------------------------------------------------- '''
-    ''' 3.4.7 – The Length Operator                                             '''
-    ''' ----------------------------------------------------------------------- '''
+    # Removed in
+    # ''' ----------------------------------------------------------------------- '''
+    # ''' 3.4.7 – The Length Operator                                             '''
+    # ''' ----------------------------------------------------------------------- '''
 
-    def test_length_op(self):
-        tree = ast.parse(r'len = #t')
-        exp = Chunk(Block([Assign(
-            targets=[Name('len')],
-            values=[ULengthOP(operand=Name('t'))]
-        )]))
-        self.assertEqual(exp, tree)
+    # def test_length_op(self):
+    #     tree = ast.parse(r'len = #t')
+    #     exp = Chunk(Block([Assign(
+    #         targets=[Name('len')],
+    #         values=[ULengthOP(operand=Name('t'))]
+    #     )]))
+    #     self.assertEqual(exp, tree)
 
     ''' ----------------------------------------------------------------------- '''
     ''' 3.4.9 – Table Constructors                                              '''

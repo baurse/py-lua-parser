@@ -44,6 +44,20 @@ class CommentsTestCase(tests.TestCase):
         ]))
         self.assertEqual(exp, tree)
 
+    def test_comment_synonym_before_global_assign(self):
+        tree = ast.parse(textwrap.dedent("""
+            # rate limit
+            rate_limit = 192
+            """))
+        exp = Chunk(Block([
+            Assign(
+                [Name('rate_limit')],
+                [Number(192)],
+                [Comment('# rate limit')]
+            )
+        ]))
+        self.assertEqual(exp, tree)
+
     def test_comment_before_method(self):
         tree = ast.parse(textwrap.dedent("""       
             --- description

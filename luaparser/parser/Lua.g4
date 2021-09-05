@@ -162,7 +162,7 @@ bitwise_expr
 
 unary_expr
   : MINUS unary_expr
-  | LENGTH pow_expr
+  // | LENGTH pow_expr
   | NOT unary_expr
   | BITNOT unary_expr
   | pow_expr
@@ -263,6 +263,7 @@ THEN      : 'then';
 TRUE      : 'true';
 UNTIL     : 'until';
 WHILE     : 'while';
+// Continue  : 'continue'; // New Keyword added in FAF-Lua
 ADD       : '+';
 MINUS     : '-';
 MULT      : '*';
@@ -270,9 +271,9 @@ DIV       : '/';
 FLOOR     : '//';
 MOD       : '%';
 POW       : '^';
-LENGTH    : '#';
+// LENGTH    : '#'; // The length operator doesn't exist in FAF-Lua. It's a line comment instead
 EQ        : '==';
-NEQ       : ('~=' | '!=');
+NEQ       : ('~=' | '!='); // '!=' is a synonym of '~=' in FAF-Lua
 LTEQ      : '<=';
 GTEQ      : '>=';
 LT        : '<';
@@ -317,10 +318,10 @@ COMMENT
     : '--[' NESTED_STR ']' -> channel(HIDDEN)
     ;
 
-// The #** is actually the FAF BOM, not just a comment, 
-// but implementing it like this suffices for now. TODO
+// Ostensibly the #** at the start of files is a FAF-Lua BOM, not just a comment, 
+// but implementing it like one suffices for now
 LINE_COMMENT
-    : ('--' | '#**') 
+    : ('--' | '#') 
     (                                               // --
     | '[' '='*                                      // --[==
     | '[' '='* ~('='|'['|'\r'|'\n') ~('\r'|'\n')*   // --[==AA
