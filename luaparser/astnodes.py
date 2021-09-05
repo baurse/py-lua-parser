@@ -285,7 +285,7 @@ class Break(Statement):
 
 
 class Continue(Statement):
-    """Define the break lua statement.
+    """Define the continue FAF-lua statement.
 
     """
 

@@ -19,6 +19,15 @@ class LuaOutputTestCase(tests.TestCase):
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_if_with_continue_and_break(self):
+        source = textwrap.dedent('''\
+            if a == b then
+                continue
+            else
+                break
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
     def test_repeat(self):
         source = textwrap.dedent('''\
             repeat

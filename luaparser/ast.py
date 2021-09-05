@@ -209,6 +209,10 @@ class WalkVisitor:
     def visit(self, node):
         self._nodes.append(node)
 
+    @visitor(Continue)
+    def visit(self, node):
+        self._nodes.append(node)
+
     @visitor(Return)
     def visit(self, node):
         self._nodes.append(node)

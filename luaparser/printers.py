@@ -326,6 +326,10 @@ class LuaOutputVisitor:
     def visit(self, node: Break) -> str:
         return 'break'
 
+    @visitor(Continue)
+    def visit(self, node: Break) -> str:
+        return 'continue'
+
     @visitor(Return)
     def visit(self, node: Return) -> str:
         return 'return ' + self.visit(node.values)
