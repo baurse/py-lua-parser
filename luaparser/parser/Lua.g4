@@ -263,7 +263,7 @@ THEN      : 'then';
 TRUE      : 'true';
 UNTIL     : 'until';
 WHILE     : 'while';
-// Continue  : 'continue'; // New Keyword added in FAF-Lua
+CONTINUE  : 'continue'; // New Keyword added in FAF-Lua
 ADD       : '+';
 MINUS     : '-';
 MULT      : '*';

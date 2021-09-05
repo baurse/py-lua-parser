@@ -331,6 +331,15 @@ class StatementsTestCase(tests.TestCase):
         ]))
         self.assertEqual(exp, tree)
 
+    def test_continue(self):
+        tree = ast.parse(textwrap.dedent("""
+            continue
+            """))
+        exp = Chunk(Block([
+            Continue()
+        ]))
+        self.assertEqual(exp, tree)
+
     def test_return(self):
         tree = ast.parse(r'return nil')
         exp = Chunk(Block([Return([
