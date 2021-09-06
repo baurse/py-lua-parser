@@ -305,27 +305,20 @@ class Builder:
         """
         if not self.comments:
             return []
-
         idx = 0
         comments: List[Comment] = []
-
         # search first comment
         while idx < len(self.comments) and self.comments[idx] is None:
             idx = idx + 1
-        # get comments starting from this index
-        while idx < len(self.comments) - 2:
-            comments.append(self.comments[idx])
-            # break if an empty line follows
-            if self.comments[idx + 1] is None and self.comments[idx + 2] is None:
-                self.comments = self.comments[idx + 3:]
+        # search last empty line
+        idy = len(self.comments) - 1
+        while idy > 0:
+            if self.comments[idy] is None and self.comments[idy - 1] is None:
+                # return comments from start of chunk to the last empty line
+                comments = list(filter(None, self.comments[idx : idy - 1]))
+                self.comments = self.comments[idy + 1:]
                 return comments
-            idx = idx + 1
-        # # check if followed by a blank line
-        # if idx + 1 < len(self.comments):
-        #     if self.comments[idx] is None and self.comments[idx + 1] is None:
-        #         # clean list
-        #         self.comments = self.comments[idx + 2:]
-        #         return comments
+            idy -= 1
         return []
 
     def get_inline_comment(self) -> Comment or None:

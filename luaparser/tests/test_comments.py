@@ -187,6 +187,29 @@ class CommentsTestCase(tests.TestCase):
         )
         self.assertEqual(exp, tree)
 
+    def test_multi_line_comment_at_chunk_start_2(self):
+        tree = ast.parse(textwrap.dedent("""
+            -- this is a comment at the start of a chunk
+            -- it has more than one line!
+
+            -- this comment too is part of the chunk comment
+
+            -- the below is a rate limit
+            rate_limit = 192
+            """))
+        exp = Chunk(Block([
+            Assign(
+                [Name('rate_limit')],
+                [Number(192)],
+                [Comment('-- the below is a rate limit')]
+            )
+        ]),
+        [Comment('-- this is a comment at the start of a chunk'), 
+        Comment('-- it has more than one line!'),
+        Comment('-- this comment too is part of the chunk comment')]
+        )
+        self.assertEqual(exp, tree)
+
     def test_multi_line_comment_at_chunk_start_belonging_to_statement(self):
         tree = ast.parse(textwrap.dedent("""
             -- this is a comment at the start of a chunk
