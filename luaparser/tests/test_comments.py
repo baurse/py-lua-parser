@@ -87,7 +87,7 @@ class CommentsTestCase(tests.TestCase):
                     Field(TrueExpr(), FalseExpr(), [Comment('-- test')], between_brackets=True),
                     Field(Number(1), String('foo', StringDelimiter.DOUBLE_QUOTE), [Comment('-- just a value')]),
                     Field(Number(2), Name('toto'), [Comment('-- last'), Comment('-- toto value')]),
-                    Field(Name('Model'), TrueExpr(), [Comment('-- model')])
+                    Field(Name('Model'), TrueExpr(), [Comment(''), Comment('-- model')])
                 ])],
                 [Comment('--- @table a table of constants')]
             )
@@ -113,7 +113,8 @@ class CommentsTestCase(tests.TestCase):
                 ])]
             )
         ]), comments=[
-            Comment('--- @module utils')
+            Comment('--- @module utils'),
+            Comment('')
         ])
         self.assertEqual(exp, tree)
 
@@ -163,11 +164,31 @@ class CommentsTestCase(tests.TestCase):
                 [Comment('-- the below is a rate limit')]
             )
         ]),
-        [Comment('-- this is a comment at the start of a chunk')]
+        [Comment('-- this is a comment at the start of a chunk'),
+        Comment('')]
         )
         self.assertEqual(exp, tree)
 
-    def test_multi_line_comment_at_chunk_start(self):
+    def test_multi_line_comment_at_chunk_star(self):
+        tree = ast.parse(textwrap.dedent("""
+            -- this is a comment at the start of a chunk
+            -- it has more than one line!
+
+            rate_limit = 192
+            """))
+        exp = Chunk(Block([
+            Assign(
+                [Name('rate_limit')],
+                [Number(192)]
+            )
+        ]),
+        [Comment('-- this is a comment at the start of a chunk'), 
+        Comment('-- it has more than one line!'),
+        Comment('')]
+        )
+        self.assertEqual(exp, tree)
+
+    def test_multi_line_comment_at_chunk_start_2(self):
         tree = ast.parse(textwrap.dedent("""
             -- this is a comment at the start of a chunk
             -- it has more than one line!
@@ -183,11 +204,12 @@ class CommentsTestCase(tests.TestCase):
             )
         ]),
         [Comment('-- this is a comment at the start of a chunk'), 
-        Comment('-- it has more than one line!')]
+        Comment('-- it has more than one line!'),
+        Comment('')]
         )
         self.assertEqual(exp, tree)
 
-    def test_multi_line_comment_at_chunk_start_2(self):
+    def test_multi_line_comment_at_chunk_start_3(self):
         tree = ast.parse(textwrap.dedent("""
             -- this is a comment at the start of a chunk
             -- it has more than one line!
@@ -206,7 +228,9 @@ class CommentsTestCase(tests.TestCase):
         ]),
         [Comment('-- this is a comment at the start of a chunk'), 
         Comment('-- it has more than one line!'),
-        Comment('-- this comment too is part of the chunk comment')]
+        Comment(''),
+        Comment('-- this comment too is part of the chunk comment'),
+        Comment('')]
         )
         self.assertEqual(exp, tree)
 

@@ -296,7 +296,14 @@ class Builder:
         self._hidden_handled = True
 
     def get_comments(self) -> Comments:
-        comments = [c for c in self.comments if c is not None]
+        comments: List[Comment] = []
+        for i in range(len(self.comments)):
+            if self.comments[i] is not None:
+                comments.append(self.comments[i])
+            elif i <= len(self.comments) - 2 \
+                and self.comments[i] is None and self.comments[i + 1] is None:
+                # Two successive None indicate an empty line
+                comments.append(Comment(''))
         self.comments = []
         return comments
 
@@ -305,17 +312,21 @@ class Builder:
         """
         if not self.comments:
             return []
-        idx = 0
         comments: List[Comment] = []
-        # search first comment
-        while idx < len(self.comments) and self.comments[idx] is None:
-            idx = idx + 1
         # search last empty line
         idy = len(self.comments) - 1
         while idy > 0:
+            # return comments from start of chunk to the last empty line
             if self.comments[idy] is None and self.comments[idy - 1] is None:
-                # return comments from start of chunk to the last empty line
-                comments = list(filter(None, self.comments[idx : idy - 1]))
+                # add the new lines
+                for i in range(idy):
+                    if self.comments[i] is not None:
+                        comments.append(self.comments[i])
+                    elif i <= len(self.comments) - 2 \
+                        and self.comments[i] is None and self.comments[i + 1] is None:
+                        # Two successive None indicate an empty line
+                        if comments: # We don't care about empty lines at the beginning of a chunk
+                            comments.append(Comment(''))
                 self.comments = self.comments[idy + 1:]
                 return comments
             idy -= 1
@@ -348,7 +359,6 @@ class Builder:
         self._stream.LT(1)
         self.handle_hidden_left()
         comments = self.get_comments_followed_by_blank_line()
-        # comments = self.get_comments() # Getting all comments here allows us to have multi-line comments at the file/chunk beginning -> Not true/needed actually lol
         block = self.parse_block()
         # hacky(?) way to save trailing comments after a chunk, like at the end of a file
         self._hidden_handled = False
@@ -374,6 +384,8 @@ class Builder:
         stat = self.parse_ret_stat()
         if stat:
             statements.append(stat)
+        # Any comments not yet processed don't belong to this block
+        self.comments = [] 
         return Block(statements)
 
     def parse_stat(self) -> Statement or None:
