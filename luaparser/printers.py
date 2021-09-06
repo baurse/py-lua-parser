@@ -253,7 +253,6 @@ class LuaOutputVisitor:
         else:
             separator = ', '
         return separator.join([self.visit(n) for n in node])
-        # return ', '.join([self.visit(n) for n in node])
 
     @visitor(type(None))
     def visit(self, node) -> str:
@@ -262,7 +261,6 @@ class LuaOutputVisitor:
     @visitor(Chunk)
     def visit(self, node) -> str:
         return "\n".join(filter(None, (self.visit(node.comments), self.visit(node.body), self.visit(node.trailing_comments))))
-        # return self.visit(node.body)
 
     @visitor(Block)
     def visit(self, node: Block) -> str:
@@ -273,16 +271,13 @@ class LuaOutputVisitor:
             if comment != (None or ''): output.append(comment)
             output.append(self.visit(n))
         output = '\n'.join(output)
-        # output = indent(output, ' ' * self._curr_indent)
         if self._curr_indent != 0:
             output = indent(output, ' ' * self._indent_size)
-        # output = indent('\n'.join([self.visit(n) for n in node.body]), ' ' * self._curr_indent)
         self._down()
         return output
 
     @visitor(Assign)
     def visit(self, node: Assign) -> str:
-        # return "\n".join(filter(None, (self.visit(node.comments), self.visit(node.targets)))) + ' = ' + self.visit(node.values)
         return self.visit(node.targets) + ' = ' + self.visit(node.values)
 
     @visitor(LocalAssign)
