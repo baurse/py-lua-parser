@@ -313,15 +313,19 @@ class Builder:
         while idx < len(self.comments) and self.comments[idx] is None:
             idx = idx + 1
         # get comments starting from this index
-        while idx < len(self.comments) and self.comments[idx] is not None:
+        while idx < len(self.comments) - 2:
             comments.append(self.comments[idx])
-            idx = idx + 1
-        # check if followed by a blank line
-        if idx + 1 < len(self.comments):
-            if self.comments[idx] is None and self.comments[idx + 1] is None:
-                # clean list
-                self.comments = self.comments[idx + 2:]
+            # break if an empty line follows
+            if self.comments[idx + 1] is None and self.comments[idx + 2] is None:
+                self.comments = self.comments[idx + 3:]
                 return comments
+            idx = idx + 1
+        # # check if followed by a blank line
+        # if idx + 1 < len(self.comments):
+        #     if self.comments[idx] is None and self.comments[idx + 1] is None:
+        #         # clean list
+        #         self.comments = self.comments[idx + 2:]
+        #         return comments
         return []
 
     def get_inline_comment(self) -> Comment or None:
