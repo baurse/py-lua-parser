@@ -58,6 +58,19 @@ class CommentsTestCase(tests.TestCase):
         ]))
         self.assertEqual(exp, tree)
 
+    def test_inline_comment_at_global_assign(self):
+        tree = ast.parse(textwrap.dedent("""
+            rate_limit = 192 -- rate limit
+            """))
+        exp = Chunk(Block([
+            Assign(
+                [Name('rate_limit')],
+                [Number(192)],
+                [Comment('-- rate limit')]
+            )
+        ]))
+        self.assertEqual(exp, tree)
+
     def test_comment_before_method(self):
         tree = ast.parse(textwrap.dedent("""       
             --- description
@@ -158,6 +171,23 @@ class CommentsTestCase(tests.TestCase):
                 [Name('rate_limit')],
                 [Number(192)],
                 [Comment('-- the below is a rate limit')]
+            )
+        ]),
+        None,
+        [Comment('-- the above specifies is a rate limit')])
+        self.assertEqual(exp, tree)
+
+    def test_comments_all_around_global_assign(self):
+        tree = ast.parse(textwrap.dedent("""
+            -- the below is a rate limit
+            rate_limit = 192 -- this is a rate limit
+            -- the above specifies is a rate limit
+            """))
+        exp = Chunk(Block([
+            Assign(
+                [Name('rate_limit')],
+                [Number(192)],
+                [Comment('-- the below is a rate limit'), Comment('-- this is a rate limit')]
             )
         ]),
         None,

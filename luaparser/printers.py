@@ -260,15 +260,20 @@ class LuaOutputVisitor:
 
     @visitor(Chunk)
     def visit(self, node) -> str:
-        return "\n".join(filter(None, (self.visit(node.comments), self.visit(node.body), self.visit(node.trailing_comments))))
+        # the filter statement does not just filter out Nones (which should never be generated) it also filters out 
+        # empty strings which might be generated from visiting the comments and trailing comments
+        return "\n".join(filter(None, [
+            self.visit(node.comments), 
+            self.visit(node.body), 
+            self.visit(node.trailing_comments)
+            ]))
 
     @visitor(Block)
     def visit(self, node: Block) -> str:
         self._up()
         output = []
         for n in node.body:
-            comment = self.visit(n.comments)
-            if comment != (None or ''): output.append(comment)
+            if n.comments: output.append(self.visit(n.comments))
             output.append(self.visit(n))
         output = '\n'.join(output)
         if self._curr_indent != 0:
@@ -421,6 +426,9 @@ class LuaOutputVisitor:
         self._up()
         field_index = 1 # Lua starts counting at 1 :(
         for field in node.fields:
+            comment = self.visit(field.comments)
+            if comment != (None or ''): 
+                output += indent(comment + '\n', ' ' * self._curr_indent)
             output += indent(self.visit(field, field_index) + ',\n', ' ' * self._curr_indent)
             field_index += 1
         self._down()

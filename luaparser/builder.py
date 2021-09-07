@@ -333,12 +333,10 @@ class Builder:
         return []
 
     def get_inline_comment(self) -> Comment or None:
-        if self.comments:
-            c = self.comments.pop(0)
-            if c is None:
-                return None
-            else:
-                return c
+        if self.comments and self.comments[0] is not None:
+            c = self.comments[0]
+            self.comments[0] = None
+            return c
         return None
 
     def has_newline_before(self) -> bool:
@@ -360,9 +358,11 @@ class Builder:
         self.handle_hidden_left()
         comments = self.get_comments_followed_by_blank_line()
         block = self.parse_block()
-        # hacky(?) way to save trailing comments after a chunk, like at the end of a file
+        # hacky(!) way to save trailing comments after a chunk, like at the end of a file
         self._hidden_handled = False
         self.handle_hidden_right()
+        # avoid the last statement's inline comment being erroneously added to the trailing comments. Also hacky
+        if self.comments: self.comments.pop(0)
         trailing_comments = self.get_comments()
         if block:
             token = self._stream.LT(1)
@@ -384,7 +384,8 @@ class Builder:
         stat = self.parse_ret_stat()
         if stat:
             statements.append(stat)
-        # Any comments not yet processed don't belong to this block
+        # Any comments not processed need to be reset as they can srew with the next block or chunk. 
+        # This can happen e.g. at the end of a table.
         self.comments = [] 
         return Block(statements)
 
@@ -402,6 +403,10 @@ class Builder:
             self.parse_for_stat() or \
             self.parse_function() or \
             self.parse_label()
+
+        inline_comment = self.get_inline_comment()
+        if inline_comment:
+            comments.append(inline_comment)
 
         # comments = self.get_comments() # getting the comments here does add the comments in the same line to the correct statement
 
@@ -1272,6 +1277,12 @@ class Builder:
                     inline_com = self.get_inline_comment()
                     if inline_com:
                         field.comments.append(inline_com)
+                        # this pop(0) is a very hacky solution implemented because the original get_inline_comment also removed the
+                        # first list element while the current iteration only sets it to None. The correct way to implement 
+                        # this here is to adjust the self.next_in_rc() call above to return the correct amount of 
+                        # lines/comments in the first place, but I don't understand how that function works, hence this hack
+                        # it is.
+                        self.comments.pop(0)
                     field = self.parse_field()
                     if field:
                         field_list.append(field)
@@ -1281,7 +1292,6 @@ class Builder:
                         self.success()
                         return field_list
                 else:
-
                     field.comments.extend(self.get_comments())
                     self.failure()
                     break
