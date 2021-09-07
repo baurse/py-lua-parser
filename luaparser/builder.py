@@ -334,9 +334,12 @@ class Builder:
 
     def get_inline_comment(self) -> Comment or None:
         if self.comments and self.comments[0] is not None:
-            c = self.comments[0]
-            self.comments[0] = None
-            return c
+        # if self.comments:
+            # c = self.comments[0]
+            # self.comments[0] = None
+            # self.comments.pop(0)
+            # return c
+            return self.comments.pop(0)
         return None
 
     def has_newline_before(self) -> bool:
@@ -362,7 +365,7 @@ class Builder:
         self._hidden_handled = False
         self.handle_hidden_right()
         # avoid the last statement's inline comment being erroneously added to the trailing comments. Also hacky
-        if self.comments: self.comments.pop(0)
+        if self.comments and self.comments[0] is not None: self.comments.pop(0)
         trailing_comments = self.get_comments()
         if block:
             token = self._stream.LT(1)
@@ -1281,12 +1284,12 @@ class Builder:
                     inline_com = self.get_inline_comment()
                     if inline_com:
                         field.comments.append(inline_com)
-                        # this pop(0) is a very hacky solution implemented because the original get_inline_comment also removed the
-                        # first list element while the current iteration only sets it to None. The correct way to implement 
-                        # this here is to adjust the self.next_in_rc() call above to return the correct amount of 
-                        # lines/comments in the first place, but I don't understand how that function works, hence this hack
-                        # it is.
-                        self.comments.pop(0)
+                        # # this pop(0) is a very hacky solution implemented because the original get_inline_comment also removed the
+                        # # first list element while the current iteration only sets it to None. The correct way to implement 
+                        # # this here is to adjust the self.next_in_rc() call above to return the correct amount of 
+                        # # lines/comments in the first place, but I don't understand how that function works, hence this hack
+                        # # it is.
+                        # self.comments.pop(0)
                     field = self.parse_field()
                     if field:
                         field_list.append(field)
