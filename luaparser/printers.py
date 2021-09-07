@@ -417,6 +417,9 @@ class LuaOutputVisitor:
         self._up()
         field_index = 1 # Lua starts counting at 1 :(
         for field in node.fields:
+            comment = self.visit(field.comments)
+            if comment != (None or ''): 
+                output += indent(comment + '\n', ' ' * self._curr_indent)
             output += indent(self.visit(field, field_index) + ',\n', ' ' * self._curr_indent)
             field_index += 1
         self._down()

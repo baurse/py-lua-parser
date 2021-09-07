@@ -138,6 +138,20 @@ class LuaOutputTestCase(tests.TestCase):
             }''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_table_comments(self):
+        source = textwrap.dedent('''\
+            -- this is a table
+            local table = {
+                -- this is the first field
+                ['ok'] = true,
+                -- this is the second field
+                foo = bar,
+                foob = barb,
+                -- this is the fourth field
+                a = b,
+            }''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
     def test_table_as_array(self):
         source = textwrap.dedent('''\
             local table = {

@@ -1285,7 +1285,6 @@ class Builder:
                         self.success()
                         return field_list
                 else:
-
                     field.comments.extend(self.get_comments())
                     self.failure()
                     break
