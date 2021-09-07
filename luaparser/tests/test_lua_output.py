@@ -161,10 +161,56 @@ class LuaOutputTestCase(tests.TestCase):
             }''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_table_comments_with_whitespace(self):
+        source = textwrap.dedent('''\
+            -- this is a table
+            local table = {
+                -- this is the first field
+
+                ['ok'] = true,
+                -- this is the second field
+
+
+                foo = bar,
+
+                foob = barb,
+                -- this is the fourth field
+                a = b,
+            }''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
     def test_table_as_array(self):
         source = textwrap.dedent('''\
             local table = {
                 true,
                 bar,
             }''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_comment_at_chunk_start(self):
+        source = textwrap.dedent('''\
+            -- this is a comment at the chunk start
+            
+            a = 42''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_comment_at_chunk_start_2(self):
+        source = textwrap.dedent('''\
+            -- this is a comment at the chunk start
+            
+            -- this comment belongs to the statement
+            a = 42''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_trailing_comment(self):
+        source = textwrap.dedent('''\
+            a = 42
+            -- this is a trailing comment''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_trailing_comment_with_spaces(self):
+        source = textwrap.dedent('''\
+            a = 42
+
+            -- this is a trailing comment''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))

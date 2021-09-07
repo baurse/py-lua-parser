@@ -71,6 +71,26 @@ class CommentsTestCase(tests.TestCase):
         ]))
         self.assertEqual(exp, tree)
 
+    def test_inline_comment_at_multiple_global_assigns(self):
+        tree = ast.parse(textwrap.dedent("""
+            rate_limit = 192 -- rate limit
+
+            rate_limit_two = 1922 -- rate limit 2
+            """))
+        exp = Chunk(Block([
+            Assign(
+                [Name('rate_limit')],
+                [Number(192)],
+                [Comment('-- rate limit')]
+            ),
+            Assign(
+                [Name('rate_limit_two')],
+                [Number(1922)],
+                [Comment(''), Comment('-- rate limit 2')]
+            )
+        ]))
+        self.assertEqual(exp, tree)
+
     def test_comment_before_method(self):
         tree = ast.parse(textwrap.dedent("""       
             --- description
@@ -145,6 +165,55 @@ class CommentsTestCase(tests.TestCase):
         ])
         self.assertEqual(exp, tree)
 
+    def test_comment_in_table_with_whitespace(self):
+        tree = ast.parse(textwrap.dedent("""
+            --- @module utils
+
+            return {
+                --- @export
+                BAR = 4,
+
+
+                --- test
+                FOO = 5
+            }
+            """))
+        exp = Chunk(Block([
+            Return(values=[
+                Table([
+                    Field(Name('BAR'), Number(4), [Comment('--- @export')]),
+                    Field(Name('FOO'), Number(5), [Comment(''), Comment(''), Comment('--- test')])
+                ])]
+            )
+        ]), comments=[
+            Comment('--- @module utils'),
+            Comment('')
+        ])
+        self.assertEqual(exp, tree)
+
+    def test_comment_in_table_with_whitespace_2(self):
+        tree = ast.parse(textwrap.dedent("""
+            --- @module utils
+
+            return {
+                BAR = 4,
+
+                FOO = 5
+            }
+            """))
+        exp = Chunk(Block([
+            Return(values=[
+                Table([
+                    Field(Name('BAR'), Number(4)),
+                    Field(Name('FOO'), Number(5), [Comment('')])
+                ])]
+            )
+        ]), comments=[
+            Comment('--- @module utils'),
+            Comment('')
+        ])
+        self.assertEqual(exp, tree)
+
     def test_comment_after_global_assign_at_chunk_end(self):
         tree = ast.parse(textwrap.dedent("""
             rate_limit = 192
@@ -158,6 +227,23 @@ class CommentsTestCase(tests.TestCase):
         ]),
         None,
         [Comment('-- the above specifies the rate limit')])
+        self.assertEqual(exp, tree)
+
+    def test_comment_after_global_assign_at_chunk_end_with_space(self):
+        tree = ast.parse(textwrap.dedent("""
+            rate_limit = 192
+
+
+            -- the above specifies the rate limit
+            """))
+        exp = Chunk(Block([
+            Assign(
+                [Name('rate_limit')],
+                [Number(192)]
+            )
+        ]),
+        None,
+        [Comment(''), Comment(''), Comment('-- the above specifies the rate limit')])
         self.assertEqual(exp, tree)
 
     def test_comment_before_and_after_global_assign_at_chunk_end(self):
