@@ -316,8 +316,7 @@ class StatementsTestCase(tests.TestCase):
 
     def test_continue(self):
         tree = ast.parse(textwrap.dedent("""
-            continue
-            """))
+            continue"""))
         exp = Chunk(Block([
             Continue()
         ]))

@@ -45,8 +45,7 @@ class CommentsTestCase(tests.TestCase):
     def test_comment_synonym_before_global_assign(self):
         tree = ast.parse(textwrap.dedent("""
             # rate limit
-            rate_limit = 192
-            """))
+            rate_limit = 192"""))
         exp = Chunk(Block([
             Assign(
                 [Name('rate_limit')],
