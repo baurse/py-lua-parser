@@ -68,8 +68,7 @@ class StatementsTestCase(tests.TestCase):
         tree = ast.parse(textwrap.dedent("""
             for k, v in pairs({}) do
               print(k, v)
-            end
-            """))
+            end"""))
         exp = Chunk(Block([
             Forin(
                 Block([Call(func=Name('print'), args=[Name('k'), Name('v')])]),
@@ -83,8 +82,7 @@ class StatementsTestCase(tests.TestCase):
         tree = ast.parse(textwrap.dedent("""
             for k, v in foo.pairs({}) do
               print(k, v)
-            end
-            """))
+            end"""))
         exp = Chunk(Block([
             Forin(
                 Block([Call(func=Name('print'), args=[Name('k'), Name('v')])]),
@@ -98,8 +96,7 @@ class StatementsTestCase(tests.TestCase):
         tree = ast.parse(textwrap.dedent("""
             for k, v in foo:pairs({}) do
               print(k, v)
-            end
-            """))
+            end"""))
         exp = Chunk(Block([
             Forin(
                 Block([Call(func=Name('print'), args=[Name('k'), Name('v')])]),
@@ -113,8 +110,7 @@ class StatementsTestCase(tests.TestCase):
         tree = ast.parse(textwrap.dedent("""
             for k, v in bar.foo:pairs({}) do
               print(k, v)
-            end
-            """))
+            end"""))
         exp = Chunk(Block([
             Forin(
                 body=Block([Call(func=Name('print'), args=[Name('k'), Name('v')])]),
@@ -128,8 +124,7 @@ class StatementsTestCase(tests.TestCase):
         tree = ast.parse(textwrap.dedent("""
             for k, v in bar:foo(42):pairs({}) do
               print(k, v)
-            end
-            """))
+            end"""))
         exp = Chunk(Block([
             Forin(
                 body=Block([Call(func=Name('print'), args=[Name('k'), Name('v')])]),
@@ -146,8 +141,7 @@ class StatementsTestCase(tests.TestCase):
         tree = ast.parse(textwrap.dedent("""
             for k, v in bar:foo(42).pairs({}) do
               print(k, v)
-            end
-            """))
+            end"""))
         exp = Chunk(Block([
             Forin(
                 body=Block([Call(func=Name('print'), args=[Name('k'), Name('v')])]),
@@ -161,8 +155,7 @@ class StatementsTestCase(tests.TestCase):
 
     def test_numeric_for(self):
         tree = ast.parse(textwrap.dedent("""
-            for i=1,10,2 do print(i) end
-            """))
+            for i=1,10,2 do print(i) end"""))
         exp = Chunk(Block([
             Fornum(
                 target=Name('i'),
@@ -178,8 +171,7 @@ class StatementsTestCase(tests.TestCase):
         tree = ast.parse(textwrap.dedent("""
             do
               local foo = 'bar'
-            end
-            """))
+            end"""))
         exp = Chunk(Block([
             Do(
                 body=Block([LocalAssign(targets=[Name('foo')],values=[String('bar')])])
@@ -202,8 +194,7 @@ class StatementsTestCase(tests.TestCase):
     def test_repeat_until(self):
         tree = ast.parse(textwrap.dedent("""
             repeat        
-            until true
-            """))
+            until true"""))
         exp = Chunk(Block([
             Repeat(body=Block([]), test=TrueExpr())
         ]))
@@ -212,8 +203,7 @@ class StatementsTestCase(tests.TestCase):
     def test_if(self):
         tree = ast.parse(textwrap.dedent("""
             if true then    
-            end
-            """))
+            end"""))
 
         exp = Chunk(Block([
             If(
@@ -227,8 +217,7 @@ class StatementsTestCase(tests.TestCase):
     def test_if_exp(self):
         tree = ast.parse(textwrap.dedent("""
             if (a<2) then    
-            end
-            """))
+            end"""))
         exp = Chunk(Block([
             If(
                 test=LessThanOp(
@@ -245,8 +234,7 @@ class StatementsTestCase(tests.TestCase):
         tree = ast.parse(textwrap.dedent("""
             if true then 
             elseif false then     
-            end
-            """))
+            end"""))
         exp = Chunk(Block([
             If(
                 test=TrueExpr(),
@@ -261,8 +249,7 @@ class StatementsTestCase(tests.TestCase):
             if true then 
             elseif false then  
             else   
-            end
-            """))
+            end"""))
         exp = Chunk(Block([
             If(
                 test=TrueExpr(),
@@ -283,8 +270,7 @@ class StatementsTestCase(tests.TestCase):
             elseif 42 then
             else
               return true
-            end
-            """))
+            end"""))
         exp = Chunk(Block([
             If(
                 test=TrueExpr(),
@@ -304,8 +290,7 @@ class StatementsTestCase(tests.TestCase):
 
     def test_label(self):
         tree = ast.parse(textwrap.dedent("""
-            ::foo::
-            """))
+            ::foo::"""))
         exp = Chunk(Block([
             Label(Name('foo'))
         ]))
@@ -314,8 +299,7 @@ class StatementsTestCase(tests.TestCase):
     def test_goto(self):
         tree = ast.parse(textwrap.dedent("""
             goto foo
-            ::foo::
-            """))
+            ::foo::"""))
         exp = Chunk(Block([
             Goto(label=Name('foo')),
             Label(Name('foo'))
@@ -324,8 +308,7 @@ class StatementsTestCase(tests.TestCase):
 
     def test_break(self):
         tree = ast.parse(textwrap.dedent("""
-            break
-            """))
+            break"""))
         exp = Chunk(Block([
             Break()
         ]))
@@ -348,14 +331,12 @@ class StatementsTestCase(tests.TestCase):
     def test_ambiguous_syntax(self):
         src = textwrap.dedent("""
             local a = b
-            (print)('foo')
-            """)
+            (print)('foo')""")
         self.assertRaises(SyntaxException, ast.parse, src)
 
     def test_index(self):
         tree = ast.parse(textwrap.dedent("""
-            foo.bar = 'bar'
-            """))
+            foo.bar = 'bar'"""))
         exp = Chunk(Block([
             Assign(targets=[Index(idx=Name('bar'), value=Name('foo'))], values=[String('bar')])
         ]))

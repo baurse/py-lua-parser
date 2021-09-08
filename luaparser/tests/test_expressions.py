@@ -332,8 +332,7 @@ class ExpressionsTestCase(tests.TestCase):
                 name = 'bmw'
               },
               options = { radio = true }
-            };;;
-            '''))
+            };;;'''))
         exp = Chunk(Block([Assign(
             targets=[Name('foo')],
             values=[
@@ -352,8 +351,7 @@ class ExpressionsTestCase(tests.TestCase):
           8,    16,     32,
           64,   128,    256,
           512,  1024,   2048
-        }
-        '''))
+        }'''))
         exp = Chunk(Block([Assign(
             targets=[Name('foo')],
             values=[
@@ -383,8 +381,7 @@ class ExpressionsTestCase(tests.TestCase):
           157,
           [true] = false,
           ['true'] = true,
-        };
-        '''))
+        };'''))
         exp = Chunk(Block([Assign(
             targets=[Name('foo')],
             values=[

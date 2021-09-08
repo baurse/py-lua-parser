@@ -229,3 +229,20 @@ class LuaOutputTestCase(tests.TestCase):
 
             -- this is a trailing comment''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_trailing_comment_with_spaces_2(self):
+        source = textwrap.dedent('''\
+            a = 42
+
+            -- this is a trailing comment
+            
+            
+            ''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_trailing_comment_being_white_space(self):
+        source = textwrap.dedent('''\
+            a = 42
+
+            ''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))

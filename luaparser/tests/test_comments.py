@@ -15,8 +15,7 @@ class CommentsTestCase(tests.TestCase):
             --[==[ a long
             comment
             --]==]
-            local rate_limit = 192
-            """))
+            local rate_limit = 192"""))
         exp = Chunk(Block([
             LocalAssign(
                 [Name('rate_limit')],
@@ -33,8 +32,7 @@ class CommentsTestCase(tests.TestCase):
     def test_comment_before_global_assign(self):
         tree = ast.parse(textwrap.dedent("""
             -- rate limit
-            rate_limit = 192
-            """))
+            rate_limit = 192"""))
         exp = Chunk(Block([
             Assign(
                 [Name('rate_limit')],
@@ -46,8 +44,7 @@ class CommentsTestCase(tests.TestCase):
 
     def test_inline_comment_at_global_assign(self):
         tree = ast.parse(textwrap.dedent("""
-            rate_limit = 192 -- rate limit
-            """))
+            rate_limit = 192 -- rate limit"""))
         exp = Chunk(Block([
             Assign(
                 [Name('rate_limit')],
@@ -61,8 +58,7 @@ class CommentsTestCase(tests.TestCase):
         tree = ast.parse(textwrap.dedent("""
             rate_limit = 192 -- rate limit
 
-            rate_limit_two = 1922 -- rate limit 2
-            """))
+            rate_limit_two = 1922 -- rate limit 2"""))
         exp = Chunk(Block([
             Assign(
                 [Name('rate_limit')],
@@ -82,8 +78,7 @@ class CommentsTestCase(tests.TestCase):
             --- description
             --- @tparam string arg a string
             function Class:print(arg)
-            end
-            """))
+            end"""))
         exp = Chunk(Block([
             Method(
                 source=Name('Class'),
@@ -109,8 +104,7 @@ class CommentsTestCase(tests.TestCase):
               ,toto -- toto value
               ,
               Model = true -- model
-            }
-            """))
+            }"""))
         exp = Chunk(Block([
             LocalAssign(
                 [Name('limits')],
@@ -136,8 +130,7 @@ class CommentsTestCase(tests.TestCase):
                 BAR = 4,
                 --- test
                 FOO = 5
-            }
-            """))
+            }"""))
         exp = Chunk(Block([
             Return(values=[
                 Table([
@@ -162,8 +155,7 @@ class CommentsTestCase(tests.TestCase):
 
                 --- test
                 FOO = 5
-            }
-            """))
+            }"""))
         exp = Chunk(Block([
             Return(values=[
                 Table([
@@ -185,8 +177,7 @@ class CommentsTestCase(tests.TestCase):
                 BAR = 4,
 
                 FOO = 5
-            }
-            """))
+            }"""))
         exp = Chunk(Block([
             Return(values=[
                 Table([
@@ -203,8 +194,7 @@ class CommentsTestCase(tests.TestCase):
     def test_comment_after_global_assign_at_chunk_end(self):
         tree = ast.parse(textwrap.dedent("""
             rate_limit = 192
-            -- the above specifies the rate limit
-            """))
+            -- the above specifies the rate limit"""))
         exp = Chunk(Block([
             Assign(
                 [Name('rate_limit')],
@@ -220,8 +210,7 @@ class CommentsTestCase(tests.TestCase):
             rate_limit = 192
 
 
-            -- the above specifies the rate limit
-            """))
+            -- the above specifies the rate limit"""))
         exp = Chunk(Block([
             Assign(
                 [Name('rate_limit')],
@@ -232,12 +221,44 @@ class CommentsTestCase(tests.TestCase):
         [Comment(''), Comment(''), Comment('-- the above specifies the rate limit')])
         self.assertEqual(exp, tree)
 
+    def test_white_space_at_chunk_end(self):
+        tree = ast.parse(textwrap.dedent("""
+            rate_limit = 192
+
+
+            """))
+        exp = Chunk(Block([
+            Assign(
+                [Name('rate_limit')],
+                [Number(192)]
+            )
+        ]),
+        None,
+        [Comment(''), Comment(''), Comment('')])
+        self.assertEqual(exp, tree)
+
+    def test_white_space_at_chunk_end_after_comment(self):
+        tree = ast.parse(textwrap.dedent("""
+            rate_limit = 192
+
+            -- this is a comment in between empty lines
+
+            """))
+        exp = Chunk(Block([
+            Assign(
+                [Name('rate_limit')],
+                [Number(192)]
+            )
+        ]),
+        None,
+        [Comment(''), Comment('-- this is a comment in between empty lines'), Comment(''), Comment('')])
+        self.assertEqual(exp, tree)
+
     def test_comment_before_and_after_global_assign_at_chunk_end(self):
         tree = ast.parse(textwrap.dedent("""
             -- the below is a rate limit
             rate_limit = 192
-            -- the above specifies is a rate limit
-            """))
+            -- the above specifies is a rate limit"""))
         exp = Chunk(Block([
             Assign(
                 [Name('rate_limit')],
@@ -253,8 +274,7 @@ class CommentsTestCase(tests.TestCase):
         tree = ast.parse(textwrap.dedent("""
             -- the below is a rate limit
             rate_limit = 192 -- this is a rate limit
-            -- the above specifies is a rate limit
-            """))
+            -- the above specifies is a rate limit"""))
         exp = Chunk(Block([
             Assign(
                 [Name('rate_limit')],
@@ -271,8 +291,7 @@ class CommentsTestCase(tests.TestCase):
             -- this is a comment at the start of a chunk
 
             -- the below is a rate limit
-            rate_limit = 192
-            """))
+            rate_limit = 192"""))
         exp = Chunk(Block([
             Assign(
                 [Name('rate_limit')],
@@ -290,8 +309,7 @@ class CommentsTestCase(tests.TestCase):
             -- this is a comment at the start of a chunk
             -- it has more than one line!
 
-            rate_limit = 192
-            """))
+            rate_limit = 192"""))
         exp = Chunk(Block([
             Assign(
                 [Name('rate_limit')],
@@ -310,8 +328,7 @@ class CommentsTestCase(tests.TestCase):
             -- it has more than one line!
 
             -- the below is a rate limit
-            rate_limit = 192
-            """))
+            rate_limit = 192"""))
         exp = Chunk(Block([
             Assign(
                 [Name('rate_limit')],
@@ -333,8 +350,7 @@ class CommentsTestCase(tests.TestCase):
             -- this comment too is part of the chunk comment
 
             -- the below is a rate limit
-            rate_limit = 192
-            """))
+            rate_limit = 192"""))
         exp = Chunk(Block([
             Assign(
                 [Name('rate_limit')],
@@ -355,8 +371,7 @@ class CommentsTestCase(tests.TestCase):
             -- this is a comment at the start of a chunk
             -- it has more than one line!
             -- but it actually belongs to the statement as there is no empty line between them
-            rate_limit = 192
-            """))
+            rate_limit = 192"""))
         exp = Chunk(Block([
             Assign(
                 [Name('rate_limit')],
