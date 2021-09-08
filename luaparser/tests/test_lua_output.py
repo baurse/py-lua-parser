@@ -7,8 +7,32 @@ import textwrap
 class LuaOutputTestCase(tests.TestCase):
     def test_assign(self):
         source = textwrap.dedent('''\
-            a = 42
-            local b = "42"''')
+            a = 42''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_local_assign(self):
+        source = textwrap.dedent('''\
+            local a = 42''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_multi_assign(self):
+        source = textwrap.dedent('''\
+            a, b = 42, 243''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_local_multi_assign(self):
+        source = textwrap.dedent('''\
+            local a, b = 42, 243''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_local_var(self):
+        source = textwrap.dedent('''\
+            local a''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_local_multi_var(self):
+        source = textwrap.dedent('''\
+            local a, b''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
     def test_while(self):
@@ -83,7 +107,7 @@ class LuaOutputTestCase(tests.TestCase):
                 return 1, 2, 3
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
-
+    
     def test_local_empty_func(self):
         source = textwrap.dedent('''\
             local function nop(arg, ...) end''')

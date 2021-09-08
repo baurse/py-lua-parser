@@ -287,7 +287,10 @@ class LuaOutputVisitor:
 
     @visitor(LocalAssign)
     def visit(self, node: LocalAssign) -> str:
-        return 'local ' + self.visit(node.targets) + ' = ' + self.visit(node.values)
+        if node.values:
+            return 'local ' + self.visit(node.targets) + ' = ' + self.visit(node.values)
+        else:
+            return 'local ' + self.visit(node.targets)
 
     @visitor(While)
     def visit(self, node: While) -> str:
