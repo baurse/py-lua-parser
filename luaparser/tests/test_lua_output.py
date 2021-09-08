@@ -211,6 +211,16 @@ class LuaOutputTestCase(tests.TestCase):
             }''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_table_as_partial_array(self):
+        source = textwrap.dedent('''\
+            local table = {
+                "jo",
+                ["joo"] = "jooooo",
+                jup = "jup",
+                "dude",
+            }''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
     def test_comment_at_chunk_start(self):
         source = textwrap.dedent('''\
             -- this is a comment at the chunk start
