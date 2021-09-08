@@ -8,8 +8,7 @@ class AstTestCase(tests.TestCase):
 
     def test_walk_1(self):
         src = textwrap.dedent("""
-            local a = 1
-            """)
+            local a = 1""")
         tree = ast.parse(src)
         chunk, block, local, name, number = False, False, False, False, False
         for node in ast.walk(tree):
@@ -26,8 +25,7 @@ class AstTestCase(tests.TestCase):
 
     def test_visitor_1(self):
         src = textwrap.dedent("""
-            local a = 1
-            """)
+            local a = 1""")
 
         called = False
 
@@ -42,8 +40,7 @@ class AstTestCase(tests.TestCase):
 
     def test_parse_error(self):
         src = textwrap.dedent("""
-            local a = if
-            """)
+            local a = if""")
 
         self.assertRaises(Exception, ast.parse, src)
 

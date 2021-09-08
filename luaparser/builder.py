@@ -364,8 +364,12 @@ class Builder:
         # hacky(!) way to save trailing comments after a chunk, like at the end of a file
         self._hidden_handled = False
         self.handle_hidden_right()
-        # avoid the last statement's inline comment being erroneously added to the trailing comments. Also hacky
-        if self.comments and self.comments[0] is not None: self.comments.pop(0)
+        if self.comments:
+            # avoid the last statement's inline comment being erroneously added to the trailing comments. Also hacky
+            if self.comments[0] is not None: self.comments.pop(0)
+            # The last line of a file doesn't have a newline character. As that newline character would be represented by 
+            # a None in the comments, we add it here manually.
+            self.comments.append(None)
         trailing_comments = self.get_comments()
         if block:
             token = self._stream.LT(1)

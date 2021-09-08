@@ -18,8 +18,7 @@ class IntegrationTestCase(tests.TestCase):
             function bar()
             end
           end
-        end)
-        '''))
+        end)'''))
 
         exp = Chunk(Block([
             Call(Name('describe'), [
@@ -46,8 +45,7 @@ class IntegrationTestCase(tests.TestCase):
           return true
         elseif isinstance() then
           return true
-        end
-        '''))
+        end'''))
 
         exp = Chunk(Block([If(
             test=TrueExpr(),
@@ -82,8 +80,7 @@ class IntegrationTestCase(tests.TestCase):
         local function sayHello()
             print('hello world !')
         end
-        sayHello()
-        '''))
+        sayHello()'''))
         pretty_str = ast.to_pretty_str(tree)
         exp = textwrap.dedent(r'''
         Chunk: {} 5 keys
@@ -129,8 +126,7 @@ class IntegrationTestCase(tests.TestCase):
                    print("value of a:", a)
                    a = a + 1;
                 until( a > 15 )
-            end
-            """))
+            end"""))
         nodes = ast.walk(tree)
         expected_cls = [
             Chunk,

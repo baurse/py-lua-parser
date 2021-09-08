@@ -126,8 +126,7 @@ class TypesValuesTestCase(tests.TestCase):
         tree = ast.parse(textwrap.dedent(r'''
             b = [[Multiple lines of text
             can be enclosed in double square
-            brackets.]]
-            '''))
+            brackets.]]'''))
         exp = Chunk(Block([Assign(
             targets=[Name('b')],
             values=[String('Multiple lines of text\ncan be enclosed in double square\nbrackets.', StringDelimiter.DOUBLE_SQUARE)]
