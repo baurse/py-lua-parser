@@ -423,26 +423,21 @@ class LuaOutputVisitor:
     def visit(self, node: Table):
         output = '{\n'
         self._up()
-        field_index = 1 # Lua starts counting at 1 :(
         for field in node.fields:
             if field.comments: output += indent(self.visit(field.comments) + '\n', ' ' * self._curr_indent)
-            # comment = self.visit(field.comments)
-            # if comment != (None or ''): 
-                # output += indent(comment + '\n', ' ' * self._curr_indent)
-            output += indent(self.visit(field, field_index) + ',\n', ' ' * self._curr_indent)
-            field_index += 1
+            output += indent(self.visit(field) + ',\n', ' ' * self._curr_indent)
         self._down()
         output += '}'
         return output
 
     @visitor(Field)
-    def visit(self, node: Field, field_index: int or None = None):
-        key_visit_out = self.visit(node.key)
+    def visit(self, node: Field):
+        key = self.visit(node.key)
         output = ''
-        # If the table is actually an array we don't need to print the key as it's redundant.
-        if not (field_index and key_visit_out == str(field_index)):
+        # If the field is treated like an array entry we don't need to print the key as it's redundant.
+        if not all([char.isdigit() for char in key]) or node.between_brackets:
             output = '[' if node.between_brackets else ''
-            output += self.visit(node.key)
+            output += key
             output += ']' if node.between_brackets else ''
             output += ' = '
         output += self.visit(node.value)
