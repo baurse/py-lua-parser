@@ -438,10 +438,12 @@ class Builder:
     def parse_ret_stat(self) -> Return or bool:
         self.save()
         if self.next_is_rc(Tokens.RETURN):
-            expr_list = self.parse_expr_list()  # optional
+            # no return statement, i.e. an empty expression list, is equivalent to returning nil
+            expr_list = self.parse_expr_list() or [Nil()]
             # consume optional token
             if self.next_is(Tokens.SEMCOL):
                 self.next_is_rc(Tokens.SEMCOL)
+            
 
             self.success()
             return Return(expr_list)
