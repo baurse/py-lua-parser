@@ -338,7 +338,10 @@ class LuaOutputVisitor:
 
     @visitor(Return)
     def visit(self, node: Return) -> str:
-        return 'return ' + self.visit(node.values)
+        if len(node.values) == 1 and isinstance(node.values[0], Nil):
+            return 'return'
+        else:
+            return 'return ' + self.visit(node.values)
 
     @visitor(Fornum)
     def visit(self, node: Fornum) -> str:

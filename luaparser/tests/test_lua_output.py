@@ -95,6 +95,27 @@ class LuaOutputTestCase(tests.TestCase):
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_func_nil_return(self):
+        source = textwrap.dedent('''\
+            function nop(arg, ...)
+                break
+                return nil
+            end''')
+        exp = textwrap.dedent('''\
+            function nop(arg, ...)
+                break
+                return
+            end''')
+        self.assertEqual(exp, ast.to_lua_source(ast.parse(source)))
+
+    def test_func_empty_return(self):
+        source = textwrap.dedent('''\
+            function nop(arg, ...)
+                break
+                return
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
     def test_empty_func(self):
         source = textwrap.dedent('''\
             function nop(arg, ...) end''')
