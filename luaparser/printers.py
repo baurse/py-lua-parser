@@ -424,13 +424,16 @@ class LuaOutputVisitor:
 
     @visitor(Table)
     def visit(self, node: Table):
-        output = '{\n'
-        self._up()
-        for field in node.fields:
-            if field.comments: output += indent(self.visit(field.comments) + '\n', ' ' * self._curr_indent)
-            output += indent(self.visit(field) + ',\n', ' ' * self._curr_indent)
-        self._down()
-        output += '}'
+        if node.fields:
+            output = '{\n'
+            self._up()
+            for field in node.fields:
+                if field.comments: output += indent(self.visit(field.comments) + '\n', ' ' * self._curr_indent)
+                output += indent(self.visit(field) + ',\n', ' ' * self._curr_indent)
+            self._down()
+            output += '}'
+        else:
+            output = '{}'
         return output
 
     @visitor(Field)

@@ -277,3 +277,8 @@ class LuaOutputTestCase(tests.TestCase):
 
             ''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_empty_table(self):
+        source = textwrap.dedent('''\
+            Class(DefaultProjectileWeapon)({})''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
