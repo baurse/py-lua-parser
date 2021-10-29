@@ -387,10 +387,20 @@ class Builder:
                 break
             statements.append(stat)
 
-        # optional ret stat
-        stat = self.parse_ret_stat()
-        if stat:
-            statements.append(stat)
+        # # Commented out and moved to the parse_stat function. 
+        # # No clue why the return statement was treated differently before
+        # # get opt ret stat comments, if they exist
+        # comments = self.get_comments()
+        # # optional ret stat
+        # stat = self.parse_ret_stat()
+        # # get inline ret stat comment, if it exists
+        # inline_comment = self.get_inline_comment()
+        # if inline_comment:
+        #     comments.append(inline_comment)
+        # if stat:
+        #     stat.comments = comments
+        #     statements.append(stat)
+        
         # Any comments not processed need to be reset as they can srew with the next block or chunk. 
         # This can happen e.g. at the end of a table.
         self.comments = [] 
@@ -409,13 +419,13 @@ class Builder:
             self.parse_if_stat() or \
             self.parse_for_stat() or \
             self.parse_function() or \
-            self.parse_label()
+            self.parse_label() or \
+            self.parse_ret_stat()
 
+        # getting the inline comments here does add the comments in the same line to the correct statement
         inline_comment = self.get_inline_comment()
         if inline_comment:
             comments.append(inline_comment)
-
-        # comments = self.get_comments() # getting the comments here does add the comments in the same line to the correct statement
 
         if stat:
             stat.comments = comments
@@ -437,13 +447,13 @@ class Builder:
 
     def parse_ret_stat(self) -> Return or bool:
         self.save()
+
         if self.next_is_rc(Tokens.RETURN):
             # no return statement, i.e. an empty expression list, is equivalent to returning nil
             expr_list = self.parse_expr_list() or [Nil()]
             # consume optional token
             if self.next_is(Tokens.SEMCOL):
                 self.next_is_rc(Tokens.SEMCOL)
-            
 
             self.success()
             return Return(expr_list)

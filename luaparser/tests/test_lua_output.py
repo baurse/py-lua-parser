@@ -278,7 +278,35 @@ class LuaOutputTestCase(tests.TestCase):
             ''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
-    def test_empty_table(self):
+    def test_empty_class_1(self):
         source = textwrap.dedent('''\
             Class(DefaultProjectileWeapon)({})''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_comments_return_before(self):
+        source = textwrap.dedent('''\
+            -- Comment before
+            return''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+    
+    def test_comments_return_after(self):
+        source = textwrap.dedent('''\
+            return
+            -- Comment after''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+    
+    def test_comments_return_line(self):
+        source = textwrap.dedent('''\
+            return -- Comment line''')
+        exp = textwrap.dedent('''\
+            -- Comment line
+            return''')
+        self.assertEqual(exp, ast.to_lua_source(ast.parse(source)))
+    
+    def test_comments_in_between_if_statement_before(self):
+        source = textwrap.dedent('''\
+            if not bp then
+                -- Comment before
+                return
+            end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
