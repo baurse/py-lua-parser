@@ -233,6 +233,28 @@ class LuaOutputTestCase(tests.TestCase):
             }''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_table_nested_in_functions(self):
+        source = textwrap.dedent('''\
+            DRA0202 = Class(CAirUnit)({
+                Weapons = {
+                    GroundMissile = Class(CIFMissileCorsairWeapon)({
+                        IdleState = State(CIFMissileCorsairWeapon.IdleState)({
+                            OnGotTarget = function(self)
+                                if self.unit:IsUnitState('Moving') then
+                                    UnitMethodsSetSpeedMult(self.unit, 1.0)
+                                else
+                                    UnitMethodsSetBreakOffTriggerMult(self.unit, 2.0)
+                                    UnitMethodsSetBreakOffDistanceMult(self.unit, 8.0)
+                                    UnitMethodsSetSpeedMult(self.unit, 0.67)
+                                    CIFMissileCorsairWeapon.IdleState.OnGotTarget(self)
+                                end
+                            end,
+                        }),
+                    }),
+                },
+            })''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
     def test_comment_at_chunk_start(self):
         source = textwrap.dedent('''\
             -- this is a comment at the chunk start
