@@ -84,8 +84,8 @@ class IntegrationTestCase(tests.TestCase):
         pretty_str = ast.to_pretty_str(tree)
         exp = textwrap.dedent(r'''
         Chunk: {} 5 keys
-          body: {} 4 keys
-            Block: {} 4 keys
+          body: {} 5 keys
+            Block: {} 5 keys
               body: [] 2 items
                 0: {} 1 key          
                   LocalFunction: {} 6 keys
@@ -95,8 +95,8 @@ class IntegrationTestCase(tests.TestCase):
                       Name: {} 4 keys
                         id: 'sayHello'
                     args: [] 0 item
-                    body: {} 4 keys
-                      Block: {} 4 keys
+                    body: {} 5 keys
+                      Block: {} 5 keys
                         stop_char: 56
                         body: [] 1 item
                           0: {} 1 key                    
@@ -115,6 +115,7 @@ class IntegrationTestCase(tests.TestCase):
                       Name: {} 4 keys
                         id: 'sayHello'
                     args: [] 0 item''')
+        self.maxDiff = None
         self.assertEqual(exp, pretty_str)
         ast.to_xml_str(tree)
 

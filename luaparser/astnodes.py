@@ -74,9 +74,12 @@ class Block(Node):
     """Define a Lua Block.
     """
 
-    def __init__(self, body: List[Statement]):
-        super(Block, self).__init__('Block')
+    def __init__(self, body: List[Statement], comments: Comments = None, trailing_comments: Comments = None):
+        super(Block, self).__init__('Block', comments)
         self.body: List[Statement] = body
+        if trailing_comments is None:
+            trailing_comments = []
+        self.trailing_comments: List[str] = trailing_comments
 
 
 class Chunk(Node):
@@ -88,9 +91,9 @@ class Chunk(Node):
 
     def __init__(self, body: Block, comments: Comments = None, trailing_comments: Comments = None):
         super(Chunk, self).__init__('Chunk', comments)
+        self.body = body
         if trailing_comments is None:
             trailing_comments = []
-        self.body = body
         self.trailing_comments: List[str] = trailing_comments
 
 

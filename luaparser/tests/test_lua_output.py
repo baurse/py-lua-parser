@@ -303,10 +303,60 @@ class LuaOutputTestCase(tests.TestCase):
             return''')
         self.assertEqual(exp, ast.to_lua_source(ast.parse(source)))
     
-    def test_comments_in_between_if_statement_before(self):
+    def test_comments_if_statement_before(self):
         source = textwrap.dedent('''\
             if not bp then
                 -- Comment before
                 return
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_comments_if_statement_after(self):
+        source = textwrap.dedent('''\
+            if not bp then
+                return
+                -- Comment after
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+    
+    def test_comments_if_statement_line(self):
+        source = textwrap.dedent('''\
+            if not bp then
+                return -- Comment line
+            end''')
+        exp = textwrap.dedent('''\
+            if not bp then
+                -- Comment line
+                return
+            end''')
+        self.assertEqual(exp, ast.to_lua_source(ast.parse(source)))
+
+    def test_comments_if_statement_all(self):
+        source = textwrap.dedent('''\
+            if not bp then
+                -- Comment before
+                return -- Comment line
+                -- Comment after
+            end''')
+        exp = textwrap.dedent('''\
+            if not bp then
+                -- Comment before
+                -- Comment line
+                return
+                -- Comment after
+            end''')
+        self.assertEqual(exp, ast.to_lua_source(ast.parse(source)))
+    
+    def test_comments_in_between_if_statement(self):
+        source = textwrap.dedent('''\
+            if enh == 'Teleporter' then
+                self:AddCommandCap('RULEUCC_Teleport')
+                -- Comment before elseif
+            elseif enh == 'TeleporterRemove' then
+                -- Comment in elseif, start
+                self:RemoveCommandCap('RULEUCC_Teleport')
+                -- Comment in elseif, trailing
+            else
+                -- meh
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))

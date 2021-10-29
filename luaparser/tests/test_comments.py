@@ -190,6 +190,48 @@ class CommentsTestCase(tests.TestCase):
             Comment('')
         ])
         self.assertEqual(exp, tree)
+    
+    def test_comment_at_end_of_if_block(self):
+        tree = ast.parse(textwrap.dedent('''\
+            if true then
+                rate_limit = 192
+                -- Comment after
+            end'''))
+        exp = Chunk(Block([
+            If(
+                test=TrueExpr(),
+                body=Block([Assign(
+                                [Name('rate_limit')],
+                                [Number(192)])
+                            ],
+                            None,
+                            [Comment('-- Comment after')]),
+                orelse=None
+            )
+        ]))
+        self.assertEqual(exp, tree)
+    
+    def test_comment_at_end_of_if_block_with_whitespace(self):
+        tree = ast.parse(textwrap.dedent('''\
+            if true then
+                rate_limit = 192
+                
+                -- Comment after
+
+            end'''))
+        exp = Chunk(Block([
+            If(
+                test=TrueExpr(),
+                body=Block([Assign(
+                                [Name('rate_limit')],
+                                [Number(192)])
+                            ],
+                            None,
+                            [Comment(''), Comment('-- Comment after'), Comment('')]),
+                orelse=None
+            )
+        ]))
+        self.assertEqual(exp, tree)
 
     def test_comment_after_global_assign_at_chunk_end(self):
         tree = ast.parse(textwrap.dedent("""
@@ -200,9 +242,9 @@ class CommentsTestCase(tests.TestCase):
                 [Name('rate_limit')],
                 [Number(192)]
             )
-        ]),
+        ],
         None,
-        [Comment('-- the above specifies the rate limit')])
+        [Comment('-- the above specifies the rate limit')]))
         self.assertEqual(exp, tree)
 
     def test_comment_after_global_assign_at_chunk_end_with_space(self):
@@ -216,9 +258,9 @@ class CommentsTestCase(tests.TestCase):
                 [Name('rate_limit')],
                 [Number(192)]
             )
-        ]),
+        ],
         None,
-        [Comment(''), Comment(''), Comment('-- the above specifies the rate limit')])
+        [Comment(''), Comment(''), Comment('-- the above specifies the rate limit')]))
         self.assertEqual(exp, tree)
 
     def test_white_space_at_chunk_end(self):
@@ -232,9 +274,9 @@ class CommentsTestCase(tests.TestCase):
                 [Name('rate_limit')],
                 [Number(192)]
             )
-        ]),
+        ],
         None,
-        [Comment(''), Comment(''), Comment('')])
+        [Comment(''), Comment(''), Comment('')]))
         self.assertEqual(exp, tree)
 
     def test_white_space_at_chunk_end_after_comment(self):
@@ -249,9 +291,9 @@ class CommentsTestCase(tests.TestCase):
                 [Name('rate_limit')],
                 [Number(192)]
             )
-        ]),
+        ],
         None,
-        [Comment(''), Comment('-- this is a comment in between empty lines'), Comment(''), Comment('')])
+        [Comment(''), Comment('-- this is a comment in between empty lines'), Comment(''), Comment('')]))
         self.assertEqual(exp, tree)
 
     def test_comment_before_and_after_global_assign_at_chunk_end(self):
@@ -265,9 +307,9 @@ class CommentsTestCase(tests.TestCase):
                 [Number(192)],
                 [Comment('-- the below is a rate limit')]
             )
-        ]),
+        ],
         None,
-        [Comment('-- the above specifies is a rate limit')])
+        [Comment('-- the above specifies is a rate limit')]))
         self.assertEqual(exp, tree)
 
     def test_comments_all_around_global_assign(self):
@@ -281,9 +323,9 @@ class CommentsTestCase(tests.TestCase):
                 [Number(192)],
                 [Comment('-- the below is a rate limit'), Comment('-- this is a rate limit')]
             )
-        ]),
+        ],
         None,
-        [Comment('-- the above specifies is a rate limit')])
+        [Comment('-- the above specifies is a rate limit')]))
         self.assertEqual(exp, tree)
 
     def test_single_line_comment_at_chunk_start(self):

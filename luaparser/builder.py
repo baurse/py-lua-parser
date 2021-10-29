@@ -361,16 +361,17 @@ class Builder:
         self.handle_hidden_left()
         comments = self.get_comments_followed_by_blank_line()
         block = self.parse_block()
-        # hacky(!) way to save trailing comments after a chunk, like at the end of a file
-        self._hidden_handled = False
-        self.handle_hidden_right()
-        if self.comments:
-            # avoid the last statement's inline comment being erroneously added to the trailing comments. Also hacky
-            if self.comments[0] is not None: self.comments.pop(0)
-            # The last line of a file doesn't have a newline character. As that newline character would be represented by 
-            # a None in the comments, we add it here manually.
-            self.comments.append(None)
-        trailing_comments = self.get_comments()
+        # # hacky(!) way to save trailing comments after a chunk, like at the end of a file
+        # self._hidden_handled = False
+        # self.handle_hidden_right()
+        # if self.comments:
+        #     # avoid the last statement's inline comment being erroneously added to the trailing comments. Also hacky
+        #     if self.comments[0] is not None: self.comments.pop(0)
+        #     # The last line of a file doesn't have a newline character. As that newline character would be represented by 
+        #     # a None in the comments, we add it here manually.
+        #     self.comments.append(None)
+        # trailing_comments = self.get_comments()
+        trailing_comments = None
         if block:
             token = self._stream.LT(1)
             if token.type == -1:
@@ -379,32 +380,34 @@ class Builder:
         return False
 
     def parse_block(self) -> Block:
-        statements = []
 
+        comments = self.get_comments_followed_by_blank_line()
+        
+        statements = []
         while True:
             stat = self.parse_stat()
             if not stat:
                 break
             statements.append(stat)
 
-        # # Commented out and moved to the parse_stat function. 
-        # # No clue why the return statement was treated differently before
-        # # get opt ret stat comments, if they exist
-        # comments = self.get_comments()
-        # # optional ret stat
-        # stat = self.parse_ret_stat()
-        # # get inline ret stat comment, if it exists
-        # inline_comment = self.get_inline_comment()
-        # if inline_comment:
-        #     comments.append(inline_comment)
-        # if stat:
-        #     stat.comments = comments
-        #     statements.append(stat)
+        # hacky(!) way to save trailing comments after a block, like at the end of an if statement
+        self._hidden_handled = False
+        self.handle_hidden_right()
+        if self.comments:
+            # avoid the last statement's inline comment being erroneously added to the trailing comments. Also hacky
+            if self.comments[0] is not None: self.comments.pop(0)
+            # The last line of a file doesn't have a newline character. As that newline character would be represented by 
+            # a None in the comments, we add it here manually.
+            # For this we need to test if we are at the end of file though
+            token = self._stream.LT(1)
+            if token.type == -1:
+                self.comments.append(None)
+        trailing_comments = self.get_comments()
         
-        # Any comments not processed need to be reset as they can srew with the next block or chunk. 
+        # Any comments not processed need to be reset as they can screw with the next block or chunk. 
         # This can happen e.g. at the end of a table.
         self.comments = [] 
-        return Block(statements)
+        return Block(statements, comments, trailing_comments)
 
     def parse_stat(self) -> Statement or None:
         comments = self.get_comments() # getting the comments here will ignore comments written in the same line as the statement
