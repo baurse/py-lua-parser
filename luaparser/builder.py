@@ -361,6 +361,18 @@ class Builder:
         self.handle_hidden_left()
         comments = self.get_comments_followed_by_blank_line()
         block = self.parse_block()
+        if not block.body:
+            # If the block doesn't have a body, the entire file/chunk is just comments (or empty)
+            # In that case we must remove the trailing comments from the block, as they can already be accounted for 
+            # in the chunk comments. This is all very ugly. There is a better solution, but I don't know what yet.
+            block.trailing_comments = []
+            if not comments:
+                self._hidden_handled = False
+                self.handle_hidden_left()
+                # self.comments.append(None)
+                comments = self.get_comments()
+            # The last line of a file doesn't have a newline character, hence we add it here manually.
+            comments.append(Comment(''))
         # # hacky(!) way to save trailing comments after a chunk, like at the end of a file
         # self._hidden_handled = False
         # self.handle_hidden_right()
@@ -381,7 +393,8 @@ class Builder:
 
     def parse_block(self) -> Block:
 
-        comments = self.get_comments_followed_by_blank_line()
+        # comments = self.get_comments_followed_by_blank_line()
+        comments = []
         
         statements = []
         while True:

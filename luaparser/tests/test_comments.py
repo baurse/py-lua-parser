@@ -8,6 +8,21 @@ logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:\t%(message)s')
 
 
 class CommentsTestCase(tests.TestCase):
+    def test_just_comment(self):
+        tree = ast.parse(textwrap.dedent("""\
+            -- rate limit"""))
+        exp = Chunk(Block([]), [Comment('-- rate limit'), Comment('')])
+        self.assertEqual(exp, tree)
+
+    def test_just_comment_and_whitespace(self):
+        tree = ast.parse(textwrap.dedent("""\
+            -- rate limit
+            
+            
+            """))
+        exp = Chunk(Block([]), [Comment('-- rate limit'), Comment(''), Comment(''), Comment('')])
+        self.assertEqual(exp, tree)
+
     def test_comment_before_local_assign(self):
         tree = ast.parse(textwrap.dedent("""
             -- rate limit
@@ -346,7 +361,7 @@ class CommentsTestCase(tests.TestCase):
         )
         self.assertEqual(exp, tree)
 
-    def test_multi_line_comment_at_chunk_star(self):
+    def test_multi_line_comment_at_chunk_start(self):
         tree = ast.parse(textwrap.dedent("""
             -- this is a comment at the start of a chunk
             -- it has more than one line!
