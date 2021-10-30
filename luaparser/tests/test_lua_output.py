@@ -354,6 +354,39 @@ class LuaOutputTestCase(tests.TestCase):
             -- this is a trailing comment''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_comment_between_statements(self):
+        source = textwrap.dedent('''\
+            a = 42
+            -- this is a trailing comment
+            b = 12''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_whitespace_between_statements(self):
+        source = textwrap.dedent('''\
+            a = 42
+            
+            b = 12''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_whitespace_between_statements_2(self):
+        source = textwrap.dedent('''\
+            a = 42
+            
+
+
+            b = 12''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_comment_with_whitespace_between_statements(self):
+        source = textwrap.dedent('''\
+            a = 42
+
+            -- this is a trailing comment
+
+
+            b = 12''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
     def test_trailing_comment_with_spaces(self):
         source = textwrap.dedent('''\
             a = 42
@@ -371,7 +404,7 @@ class LuaOutputTestCase(tests.TestCase):
             ''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
-    def test_trailing_comment_being_white_space(self):
+    def test_trailing_comment_being_whitespace(self):
         source = textwrap.dedent('''\
             a = 42
 
