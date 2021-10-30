@@ -162,10 +162,29 @@ class LuaOutputTestCase(tests.TestCase):
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
-    def test_call_invoke(self):
+    def test_call(self):
         source = textwrap.dedent('''\
-            call("foo")
+            call("foo")''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_invoke(self):
+        source = textwrap.dedent('''\
             invoke:me("ok")''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_nested_invoke(self):
+        source = textwrap.dedent('''\
+            func1:func2("ok"):func3("ok2")''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_nested_invoke_2(self):
+        source = textwrap.dedent('''\
+            func1:func2(thingy:func3("ok2"))''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_nested_invoke_3(self):
+        source = textwrap.dedent('''\
+            base.func1:func2(foo.bar.thingy:func3("ok2"))''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
     def test_method(self):
