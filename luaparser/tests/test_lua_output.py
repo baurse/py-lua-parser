@@ -242,6 +242,28 @@ class LuaOutputTestCase(tests.TestCase):
             }''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_table_nested_in_functions(self):
+        source = textwrap.dedent('''\
+            DRA0202 = Class(CAirUnit)({
+                Weapons = {
+                    GroundMissile = Class(CIFMissileCorsairWeapon)({
+                        IdleState = State(CIFMissileCorsairWeapon.IdleState)({
+                            OnGotTarget = function(self)
+                                if self.unit:IsUnitState('Moving') then
+                                    UnitMethodsSetSpeedMult(self.unit, 1.0)
+                                else
+                                    UnitMethodsSetBreakOffTriggerMult(self.unit, 2.0)
+                                    UnitMethodsSetBreakOffDistanceMult(self.unit, 8.0)
+                                    UnitMethodsSetSpeedMult(self.unit, 0.67)
+                                    CIFMissileCorsairWeapon.IdleState.OnGotTarget(self)
+                                end
+                            end,
+                        }),
+                    }),
+                },
+            })''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
     def test_comment_at_chunk_start(self):
         source = textwrap.dedent('''\
             -- this is a comment at the chunk start
@@ -285,4 +307,87 @@ class LuaOutputTestCase(tests.TestCase):
             a = 42
 
             ''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_empty_class_1(self):
+        source = textwrap.dedent('''\
+            Class(DefaultProjectileWeapon)({})''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_comments_return_before(self):
+        source = textwrap.dedent('''\
+            -- Comment before
+            return''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+    
+    def test_comments_return_after(self):
+        source = textwrap.dedent('''\
+            return
+            -- Comment after''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+    
+    def test_comments_return_line(self):
+        source = textwrap.dedent('''\
+            return -- Comment line''')
+        exp = textwrap.dedent('''\
+            -- Comment line
+            return''')
+        self.assertEqual(exp, ast.to_lua_source(ast.parse(source)))
+    
+    def test_comments_if_statement_before(self):
+        source = textwrap.dedent('''\
+            if not bp then
+                -- Comment before
+                return
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_comments_if_statement_after(self):
+        source = textwrap.dedent('''\
+            if not bp then
+                return
+                -- Comment after
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+    
+    def test_comments_if_statement_line(self):
+        source = textwrap.dedent('''\
+            if not bp then
+                return -- Comment line
+            end''')
+        exp = textwrap.dedent('''\
+            if not bp then
+                -- Comment line
+                return
+            end''')
+        self.assertEqual(exp, ast.to_lua_source(ast.parse(source)))
+
+    def test_comments_if_statement_all(self):
+        source = textwrap.dedent('''\
+            if not bp then
+                -- Comment before
+                return -- Comment line
+                -- Comment after
+            end''')
+        exp = textwrap.dedent('''\
+            if not bp then
+                -- Comment before
+                -- Comment line
+                return
+                -- Comment after
+            end''')
+        self.assertEqual(exp, ast.to_lua_source(ast.parse(source)))
+    
+    def test_comments_in_between_if_statement(self):
+        source = textwrap.dedent('''\
+            if enh == 'Teleporter' then
+                self:AddCommandCap('RULEUCC_Teleport')
+                -- Comment before elseif
+            elseif enh == 'TeleporterRemove' then
+                -- Comment in elseif, start
+                self:RemoveCommandCap('RULEUCC_Teleport')
+                -- Comment in elseif, trailing
+            else
+                -- meh
+            end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))

@@ -272,10 +272,12 @@ class LuaOutputVisitor:
     def visit(self, node: Block) -> str:
         self._up()
         output = []
+        output.append(self.visit(node.comments))
         for n in node.body:
             if n.comments: output.append(self.visit(n.comments))
             output.append(self.visit(n))
-        output = '\n'.join(output)
+        output.append(self.visit(node.trailing_comments))
+        output = '\n'.join(filter(None, output))
         if self._curr_indent != 0:
             output = indent(output, ' ' * self._indent_size)
         self._down()
@@ -428,13 +430,14 @@ class LuaOutputVisitor:
 
     @visitor(Table)
     def visit(self, node: Table):
-        output = '{\n'
-        self._up()
-        for field in node.fields:
-            if field.comments: output += indent(self.visit(field.comments) + '\n', ' ' * self._curr_indent)
-            output += indent(self.visit(field) + ',\n', ' ' * self._curr_indent)
-        self._down()
-        output += '}'
+        if node.fields:
+            output = '{\n'
+            for field in node.fields:
+                if field.comments: output += indent(self.visit(field.comments) + '\n', ' ' * self._indent_size)
+                output += indent(self.visit(field) + ',\n', ' ' * self._indent_size)
+            output += '}'
+        else:
+            output = '{}'
         return output
 
     @visitor(Field)

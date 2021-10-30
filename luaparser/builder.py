@@ -361,16 +361,29 @@ class Builder:
         self.handle_hidden_left()
         comments = self.get_comments_followed_by_blank_line()
         block = self.parse_block()
-        # hacky(!) way to save trailing comments after a chunk, like at the end of a file
-        self._hidden_handled = False
-        self.handle_hidden_right()
-        if self.comments:
-            # avoid the last statement's inline comment being erroneously added to the trailing comments. Also hacky
-            if self.comments[0] is not None: self.comments.pop(0)
-            # The last line of a file doesn't have a newline character. As that newline character would be represented by 
-            # a None in the comments, we add it here manually.
-            self.comments.append(None)
-        trailing_comments = self.get_comments()
+        if not block.body:
+            # If the block doesn't have a body, the entire file/chunk is just comments (or empty)
+            # In that case we must remove the trailing comments from the block, as they can already be accounted for 
+            # in the chunk comments. This is all very ugly. There is a better solution, but I don't know what yet.
+            block.trailing_comments = []
+            if not comments:
+                self._hidden_handled = False
+                self.handle_hidden_left()
+                # self.comments.append(None)
+                comments = self.get_comments()
+            # The last line of a file doesn't have a newline character, hence we add it here manually.
+            comments.append(Comment(''))
+        # # hacky(!) way to save trailing comments after a chunk, like at the end of a file
+        # self._hidden_handled = False
+        # self.handle_hidden_right()
+        # if self.comments:
+        #     # avoid the last statement's inline comment being erroneously added to the trailing comments. Also hacky
+        #     if self.comments[0] is not None: self.comments.pop(0)
+        #     # The last line of a file doesn't have a newline character. As that newline character would be represented by 
+        #     # a None in the comments, we add it here manually.
+        #     self.comments.append(None)
+        # trailing_comments = self.get_comments()
+        trailing_comments = None
         if block:
             token = self._stream.LT(1)
             if token.type == -1:
@@ -379,22 +392,35 @@ class Builder:
         return False
 
     def parse_block(self) -> Block:
-        statements = []
 
+        # comments = self.get_comments_followed_by_blank_line()
+        comments = []
+        
+        statements = []
         while True:
             stat = self.parse_stat()
             if not stat:
                 break
             statements.append(stat)
 
-        # optional ret stat
-        stat = self.parse_ret_stat()
-        if stat:
-            statements.append(stat)
-        # Any comments not processed need to be reset as they can srew with the next block or chunk. 
+        # hacky(!) way to save trailing comments after a block, like at the end of an if statement
+        self._hidden_handled = False
+        self.handle_hidden_right()
+        if self.comments:
+            # avoid the last statement's inline comment being erroneously added to the trailing comments. Also hacky
+            if self.comments[0] is not None: self.comments.pop(0)
+            # The last line of a file doesn't have a newline character. As that newline character would be represented by 
+            # a None in the comments, we add it here manually.
+            # For this we need to test if we are at the end of file though
+            token = self._stream.LT(1)
+            if token.type == -1:
+                self.comments.append(None)
+        trailing_comments = self.get_comments()
+        
+        # Any comments not processed need to be reset as they can screw with the next block or chunk. 
         # This can happen e.g. at the end of a table.
         self.comments = [] 
-        return Block(statements)
+        return Block(statements, comments, trailing_comments)
 
     def parse_stat(self) -> Statement or None:
         comments = self.get_comments() # getting the comments here will ignore comments written in the same line as the statement
@@ -409,13 +435,13 @@ class Builder:
             self.parse_if_stat() or \
             self.parse_for_stat() or \
             self.parse_function() or \
-            self.parse_label()
+            self.parse_label() or \
+            self.parse_ret_stat()
 
+        # getting the inline comments here does add the comments in the same line to the correct statement
         inline_comment = self.get_inline_comment()
         if inline_comment:
             comments.append(inline_comment)
-
-        # comments = self.get_comments() # getting the comments here does add the comments in the same line to the correct statement
 
         if stat:
             stat.comments = comments
@@ -440,13 +466,13 @@ class Builder:
 
     def parse_ret_stat(self) -> Return or bool:
         self.save()
+
         if self.next_is_rc(Tokens.RETURN):
             # no return statement, i.e. an empty expression list, is equivalent to returning nil
             expr_list = self.parse_expr_list() or [Nil()]
             # consume optional token
             if self.next_is(Tokens.SEMCOL):
                 self.next_is_rc(Tokens.SEMCOL)
-            
 
             self.success()
             return Return(expr_list)
