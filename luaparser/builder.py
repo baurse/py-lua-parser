@@ -1296,7 +1296,10 @@ class Builder:
                             field.key = Number(array_like_index)
                             array_like_index += 1
 
-                return Table(fields or [])
+                # hacky(!) way to save trailing comments after the last field
+                # Only works due to the changes to hidden in self.parse_field_list() 
+                trailing_comments = self.get_comments()
+                return Table(fields or [], None, trailing_comments)
 
         return self.failure()
 
@@ -1323,6 +1326,14 @@ class Builder:
                         field_list.append(field)
                         self.success()
                     else:
+                        # hacky(!) way to save trailing comments after the last field
+                        self._hidden_handled = False
+                        self.handle_hidden_left()
+                        if self.comments:
+                            # avoid the last statement's inline comment being erroneously added to the trailing 
+                            # comments. Also hacky
+                            if self.comments[0] is not None: self.comments.pop(0)
+
                         self.success()
                         self.success()
                         return field_list
@@ -1333,6 +1344,13 @@ class Builder:
             self.parse_field_sep()
             self.success()
             return field_list
+        # hacky(!) way to save trailing comments after the last field
+        self._hidden_handled = False
+        self.handle_hidden_left()
+        if self.comments:
+            # avoid the last statement's inline comment being erroneously added to the trailing 
+            # comments. Also hacky
+            if self.comments[0] is not None: self.comments.pop(0)
         return self.failure()
 
     def parse_field(self) -> Field or bool:

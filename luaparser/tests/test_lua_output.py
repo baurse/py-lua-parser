@@ -171,10 +171,29 @@ class LuaOutputTestCase(tests.TestCase):
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
-    def test_call_invoke(self):
+    def test_call(self):
         source = textwrap.dedent('''\
-            call("foo")
+            call("foo")''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_invoke(self):
+        source = textwrap.dedent('''\
             invoke:me("ok")''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_nested_invoke(self):
+        source = textwrap.dedent('''\
+            func1:func2("ok"):func3("ok2")''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_nested_invoke_2(self):
+        source = textwrap.dedent('''\
+            func1:func2(thingy:func3("ok2"))''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_nested_invoke_3(self):
+        source = textwrap.dedent('''\
+            base.func1:func2(foo.bar.thingy:func3("ok2"))''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
     def test_method(self):
@@ -221,6 +240,65 @@ class LuaOutputTestCase(tests.TestCase):
                 foob = barb,
                 -- this is the fourth field
                 a = b,
+            }''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_table_with_trailing_comment(self):
+        source = textwrap.dedent('''\
+            local table = {
+                "jo",
+                -- this is a trailing comment
+            }''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_table_with_max_comments(self):
+        source = textwrap.dedent('''\
+            local table = {
+                -- before comment
+                "jo", -- inline comment
+                -- trailing comment
+            }''')
+        exp = textwrap.dedent('''\
+            local table = {
+                -- before comment
+                -- inline comment
+                "jo",
+                -- trailing comment
+            }''')
+        self.assertEqual(exp, ast.to_lua_source(ast.parse(source)))
+
+    def test_table_with_max_comments_and_whitespace(self):
+        source = textwrap.dedent('''\
+            local table = {
+
+                -- before comment
+
+
+                "jo", -- inline comment
+
+                -- trailing comment
+
+
+            }''')
+        exp = textwrap.dedent('''\
+            local table = {
+
+                -- before comment
+
+
+                -- inline comment
+                "jo",
+
+                -- trailing comment
+
+                
+            }''')
+        self.assertEqual(exp, ast.to_lua_source(ast.parse(source)))
+
+    def test_table_with_only_comment(self):
+        source = textwrap.dedent('''\
+            local table = {
+                -- comment
             }''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 

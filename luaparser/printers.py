@@ -430,11 +430,13 @@ class LuaOutputVisitor:
 
     @visitor(Table)
     def visit(self, node: Table):
-        if node.fields:
+        if node.fields or node.trailing_comments:
             output = '{\n'
             for field in node.fields:
                 if field.comments: output += indent(self.visit(field.comments) + '\n', ' ' * self._indent_size)
                 output += indent(self.visit(field) + ',\n', ' ' * self._indent_size)
+            if node.trailing_comments:
+                 output += indent(self.visit(node.trailing_comments) + '\n', ' ' * self._indent_size)
             output += '}'
         else:
             output = '{}'
