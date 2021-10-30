@@ -215,6 +215,65 @@ class LuaOutputTestCase(tests.TestCase):
             }''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_table_with_trailing_comment(self):
+        source = textwrap.dedent('''\
+            local table = {
+                "jo",
+                -- this is a trailing comment
+            }''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_table_with_max_comments(self):
+        source = textwrap.dedent('''\
+            local table = {
+                -- before comment
+                "jo", -- inline comment
+                -- trailing comment
+            }''')
+        exp = textwrap.dedent('''\
+            local table = {
+                -- before comment
+                -- inline comment
+                "jo",
+                -- trailing comment
+            }''')
+        self.assertEqual(exp, ast.to_lua_source(ast.parse(source)))
+
+    def test_table_with_max_comments_and_whitespace(self):
+        source = textwrap.dedent('''\
+            local table = {
+
+                -- before comment
+
+
+                "jo", -- inline comment
+
+                -- trailing comment
+
+
+            }''')
+        exp = textwrap.dedent('''\
+            local table = {
+
+                -- before comment
+
+
+                -- inline comment
+                "jo",
+
+                -- trailing comment
+
+                
+            }''')
+        self.assertEqual(exp, ast.to_lua_source(ast.parse(source)))
+
+    def test_table_with_only_comment(self):
+        source = textwrap.dedent('''\
+            local table = {
+                -- comment
+            }''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
     def test_table_as_array(self):
         source = textwrap.dedent('''\
             local table = {

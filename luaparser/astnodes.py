@@ -517,9 +517,12 @@ class Table(Expression):
         fields (`list<Field>`): Table fields.
     """
 
-    def __init__(self, fields: List[Field]):
-        super(Table, self).__init__('Table')
+    def __init__(self, fields: List[Field], comments: Comments = None, trailing_comments: Comments = None):
+        super(Table, self).__init__('Table', comments)
         self.fields: List[Field] = fields
+        if trailing_comments is None:
+            trailing_comments = []
+        self.trailing_comments: List[str] = trailing_comments
 
 
 class Dots(Expression):
