@@ -252,6 +252,9 @@ class LuaOutputVisitor:
             separator = '\n'
         else:
             separator = ', '
+        # str_to_join = [self.visit(n) for n in node]
+        # val = separator.join(str_to_join)
+        # return val
         return separator.join([self.visit(n) for n in node])
 
     @visitor(type(None))
@@ -272,12 +275,14 @@ class LuaOutputVisitor:
     def visit(self, node: Block) -> str:
         self._up()
         output = []
-        output.append(self.visit(node.comments))
+        if node.comments:
+            output.append(self.visit(node.comments))
         for n in node.body:
             if n.comments: output.append(self.visit(n.comments))
             output.append(self.visit(n))
-        output.append(self.visit(node.trailing_comments))
-        output = '\n'.join(filter(None, output))
+        if node.trailing_comments:
+            output.append(self.visit(node.trailing_comments))
+        output = '\n'.join(output)
         if self._curr_indent != 0:
             output = indent(output, ' ' * self._indent_size)
         self._down()
