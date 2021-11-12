@@ -312,19 +312,20 @@ class LuaOutputVisitor:
         output = 'if ' + self.visit(node.test) + ' then\n' + self.visit(node.body) + '\n'
         if node.orelse:
             if isinstance(node.orelse, ElseIf):
-                output += self.visit(node.orelse) + '\n'
+                output += self.visit(node.orelse)
             else:
-                output += 'else\n' + self.visit(node.orelse) + '\n'
+                output += 'else\n' + self.visit(node.orelse) +'\n'
         output += 'end'
         return output
 
     @visitor(ElseIf)
     def visit(self, node: ElseIf) -> str:
         output = 'elseif ' + self.visit(node.test) + ' then\n' + self.visit(node.body) + '\n'
-        if isinstance(node.orelse, ElseIf):
-            output += self.visit(node.orelse)
-        else:
-            output += 'else\n' + self.visit(node.orelse)
+        if node.orelse:
+            if isinstance(node.orelse, ElseIf):
+                output += self.visit(node.orelse)
+            else:
+                output += 'else\n' + self.visit(node.orelse) +'\n'
         return output
 
     @visitor(Label)
