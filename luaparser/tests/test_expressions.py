@@ -187,7 +187,8 @@ class ExpressionsTestCase(tests.TestCase):
             targets=[Name('res')],
             values=[LessThanOp(
                 left=Number(1),
-                right=Number(2)
+                right=Number(2),
+                between_parenthesis=True
             )]
         )]))
         self.assertEqual(exp, tree)
@@ -198,7 +199,8 @@ class ExpressionsTestCase(tests.TestCase):
             targets=[Name('res')],
             values=[GreaterThanOp(
                 left=Number(1),
-                right=Number(2)
+                right=Number(2),
+                between_parenthesis=True
             )]
         )]))
         self.assertEqual(exp, tree)
@@ -209,7 +211,8 @@ class ExpressionsTestCase(tests.TestCase):
             targets=[Name('res')],
             values=[LessOrEqThanOp(
                 left=Number(1),
-                right=Number(2)
+                right=Number(2),
+                between_parenthesis=True
             )]
         )]))
         self.assertEqual(exp, tree)
@@ -220,7 +223,8 @@ class ExpressionsTestCase(tests.TestCase):
             targets=[Name('res')],
             values=[GreaterOrEqThanOp(
                 left=Number(1),
-                right=Number(2)
+                right=Number(2),
+                between_parenthesis=True
             )]
         )]))
         self.assertEqual(exp, tree)

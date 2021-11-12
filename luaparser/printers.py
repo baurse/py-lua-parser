@@ -6,6 +6,7 @@
 """
 
 from luaparser.astnodes import *
+from luaparser.builder import LITERAL_NAMES
 from luaparser.utils.visitor import *
 from enum import Enum
 import xml.etree.cElementTree as ElementTree
@@ -154,6 +155,79 @@ escape_dict = {
     '\9': r'\9'
 }
 
+# remove all the apostrophies from the LITERAL_NAMES to make use of the names therein as normal strings
+printable_literal_names = [name.replace("'", '') for name in  LITERAL_NAMES]
+
+# this is bad code. What I want is access to the token index in the printer functions below so that I can, e.g., get the
+# right string for the addition operator AddOp, i.e. '+' without having an if statement for every possible operator that
+# can exist. It would make sense to add this to the node class directly, instead of clumsily getting it from the
+# Note that the string name is NOT the same thing as the elements of the Tokens class that's defined in builder
+display_name_to_printable_literal_name = {
+    'LAndOp' : printable_literal_names[1],
+    # 'BREAK' : printable_literal_names[2],
+    # 'DO' : printable_literal_names[3],
+    # 'ELSETOK' : printable_literal_names[4],
+    # 'ELSEIF' : printable_literal_names[5],
+    # 'END' : printable_literal_names[6],
+    # 'FALSE' : printable_literal_names[7],
+    # 'FOR' : printable_literal_names[8],
+    # 'FUNCTION' : printable_literal_names[9],
+    # 'GOTO' : printable_literal_names[10],
+    # 'IFTOK' : printable_literal_names[11],
+    # 'IN' : printable_literal_names[12],
+    # 'LOCAL' : printable_literal_names[13],
+    # 'NIL' : printable_literal_names[14],
+    # 'NOT' : printable_literal_names[15],
+    'LOrOp' : printable_literal_names[16],
+    # 'REPEAT' : printable_literal_names[17],
+    # 'RETURN' : printable_literal_names[18],
+    # 'THEN' : printable_literal_names[19],
+    # 'TRUE' : printable_literal_names[20],
+    # 'UNTIL' : printable_literal_names[21],
+    # 'WHILE' : printable_literal_names[22],
+    'AddOp' : printable_literal_names[23],
+    'SubOp' : printable_literal_names[24],
+    'MultOp' : printable_literal_names[25],
+    'FloatDivOp' : printable_literal_names[26],
+    'FloorDivOp' : printable_literal_names[27],
+    'ModOp' : printable_literal_names[28],
+    'ExpoOp' : printable_literal_names[29],
+    # 'LENGTH' : printable_literal_names[30],
+    'REqOp' : printable_literal_names[31],
+    'RNotEqOp' : printable_literal_names[32],
+    'RLtEqOp' : printable_literal_names[33],
+    'RGtEqOp' : printable_literal_names[34],
+    'RLtOp' : printable_literal_names[35],
+    'RGtOp' : printable_literal_names[36],
+    # 'ASSIGN' : printable_literal_names[37],
+    'BAndOp' : printable_literal_names[38],
+    'BOrOp' : printable_literal_names[39],
+    'BXorOp' : printable_literal_names[40],
+    'BShiftROp' : printable_literal_names[41],
+    'BShiftLOp' : printable_literal_names[42],
+    # 'OPAR' : printable_literal_names[43],
+    # 'CPAR' : printable_literal_names[44],
+    # 'OBRACE' : printable_literal_names[45],
+    # 'CBRACE' : printable_literal_names[46],
+    # 'OBRACK' : printable_literal_names[47],
+    # 'CBRACK' : printable_literal_names[48],
+    # 'COLCOL' : printable_literal_names[49],
+    # 'COL' : printable_literal_names[50],
+    # 'COMMA' : printable_literal_names[51],
+    # 'VARARGS' : printable_literal_names[52],
+    'Concat' : printable_literal_names[53],
+    # 'DOT' : printable_literal_names[54],
+    # 'SEMCOL' : printable_literal_names[55],
+    # 'NAME' : printable_literal_names[56],
+    # 'NUMBER' : printable_literal_names[57],
+    # 'STRING' : printable_literal_names[58],
+    # 'COMMENT' : printable_literal_names[59],
+    # 'LINE_COMMENT' : printable_literal_names[60],
+    # 'SPACE' : printable_literal_names[61],
+    # 'NEWLINE' : printable_literal_names[62],
+    # 'SHEBANG' : printable_literal_names[63],
+    # 'LongBracket' : printable_literal_names[64],
+}
 
 def raw(text):
     """Returns a raw string representation of text"""
@@ -465,90 +539,21 @@ class LuaOutputVisitor:
     def visit(self, node) -> str:
         return '...'
 
-    @visitor(AddOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' + ' + self.visit(node.right)
-
-    @visitor(SubOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' - ' + self.visit(node.right)
-
-    @visitor(MultOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' * ' + self.visit(node.right)
-
-    @visitor(FloatDivOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' / ' + self.visit(node.right)
-
-    @visitor(FloorDivOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' // ' + self.visit(node.right)
-
-    @visitor(ModOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' % ' + self.visit(node.right)
-
-    @visitor(ExpoOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' ^ ' + self.visit(node.right)
-
-    @visitor(BAndOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' & ' + self.visit(node.right)
-
-    @visitor(BOrOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' | ' + self.visit(node.right)
-
-    @visitor(BXorOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' ~ ' + self.visit(node.right)
-
-    @visitor(BShiftROp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' >> ' + self.visit(node.right)
-
-    @visitor(BShiftLOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' << ' + self.visit(node.right)
-
-    @visitor(LessThanOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' < ' + self.visit(node.right)
-
-    @visitor(GreaterThanOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' > ' + self.visit(node.right)
-
-    @visitor(LessOrEqThanOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' <= ' + self.visit(node.right)
-
-    @visitor(GreaterOrEqThanOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' >= ' + self.visit(node.right)
-
-    @visitor(EqToOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' == ' + self.visit(node.right)
-
-    @visitor(NotEqToOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' ~= ' + self.visit(node.right)
-
-    @visitor(AndLoOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' and ' + self.visit(node.right)
-
-    @visitor(OrLoOp)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + ' or ' + self.visit(node.right)
-
-    @visitor(Concat)
-    def visit(self, node) -> str:
-        return self.visit(node.left) + '..' + self.visit(node.right)
-
+    @visitor(BinaryOp)
+    def visit(self, node: BinaryOp) -> str:
+        if node.between_parenthesis:
+            left_bracket = '('
+            right_bracket = ')'
+        else:
+            left_bracket = ''
+            right_bracket = ''     
+        operator = display_name_to_printable_literal_name[node.display_name]
+        
+        output = left_bracket
+        output += self.visit(node.left) + ' ' + operator + ' ' + self.visit(node.right)
+        output += right_bracket
+        return output
+    
     @visitor(UMinusOp)
     def visit(self, node) -> str:
         return '-' + self.visit(node.operand)
