@@ -63,6 +63,42 @@ class LuaOutputTestCase(tests.TestCase):
         source = textwrap.dedent('''\
             if op == "+" then
                 r = a + b
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_if_elseif(self):
+        source = textwrap.dedent('''\
+            if op == "+" then
+                r = a + b
+            elseif op == "-" then
+                foo = bar
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_if_else(self):
+        source = textwrap.dedent('''\
+            if op == "+" then
+                r = a + b
+            else
+                foo = bar
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_if_elsif_else(self):
+        source = textwrap.dedent('''\
+            if op == "+" then
+                r = a + b
+            elseif op == "-" then
+                r = a - b
+            else
+                error("invalid operation")
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+    
+    def test_if_multiple_elsif_else(self):
+        source = textwrap.dedent('''\
+            if op == "+" then
+                r = a + b
             elseif op == "-" then
                 r = a - b
             elseif op == "*" then
@@ -73,14 +109,7 @@ class LuaOutputTestCase(tests.TestCase):
                 error("invalid operation")
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
-
-    def test_if_without_else(self):
-        source = textwrap.dedent('''\
-            if op == "+" then
-                r = a + b
-            end''')
-        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
-
+    
     def test_goto(self):
         source = textwrap.dedent('''\
             ::label::
