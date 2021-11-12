@@ -557,6 +557,19 @@ class Builder:
                 expr_list = self.parse_expr_list() or []
                 if self.next_is_rc(Tokens.CPAR, False):
                     self.success()
+                    # The following is a hacky exception for the case that the last expression in the expression list of the
+                    # function invoke is a binary operator. As this binary operator sees the function call's parenthesis to 
+                    # its right (see all the lines with "between_parenthesis = True if self._stream.LT(1).type == 44 else False")
+                    # it thinks that those parenthesis belong to this operator, hence incorrectly setting its 
+                    # between_parenthesis variable to true. Besides being wrong, this also results in double parenthesis
+                    # being printed in the lua printer. Luckily for us, this extra set of parenthesis is never needed, and 
+                    # hence we can just set it to False here (and and for the call return below)
+                    try:
+                        expr_list[-1].between_parenthesis # needed to check if the between_parenthesis exists before we assign it
+                        expr_list[-1].between_parenthesis = False
+                    except (AttributeError, IndexError):
+                        # not all expressions have the between_parenthesis variable or the expression list might be empty
+                        pass
                     # noinspection PyTypeChecker
                     return Invoke(None, name, expr_list)
 
@@ -575,7 +588,6 @@ class Builder:
             if self.next_is_rc(Tokens.STRING, False):
                 string = self.parse_lua_str(self.text)
                 self.success()
-                # noinspection PyTypeChecker
                 return Invoke(None, name, [string])
 
         self.failure_save()
@@ -598,6 +610,19 @@ class Builder:
             expr_list = self.parse_expr_list() or []
             if self.next_is_rc(Tokens.CPAR, False):
                 self.success()
+                # The following is a hacky exception for the case that the last expression in the expression list of the
+                # function call is a binary operator. As this binary operator sees the function call's parenthesis to 
+                # its right (see all the lines with "between_parenthesis = True if self._stream.LT(1).type == 44 else False")
+                # it thinks that those parenthesis belong to this operator, hence incorrectly setting its 
+                # between_parenthesis variable to true. Besides being wrong, this also results in double parenthesis
+                # being printed in the lua printer. Luckily for us, this extra set of parenthesis is never needed, and 
+                # hence we can just set it to False here (and before returning an invoke above)
+                try:
+                    expr_list[-1].between_parenthesis # needed to check if the between_parenthesis exists before we assign it
+                    expr_list[-1].between_parenthesis = False
+                except (AttributeError, IndexError):
+                    # not all expressions have the between_parenthesis variable or the expression list might be empty
+                    pass
                 # noinspection PyTypeChecker
                 return Call(None, expr_list)
 
@@ -972,7 +997,12 @@ class Builder:
                     right = self.parse_and_expr()
                     if right:
                         self.success()
-                        left = OrLoOp(left, right)
+                        # check if expr. starts with an open parenthesis '('. Type 43
+                        # check if expr. ends with a cloes parenthesis bracket ')'. Type 44
+                        # Is a hack though as I almost certainly use the wrong function to check it, because I STILL don't understand
+                        # what all the token stream functions and their wrappers actually do
+                        between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                        left = OrLoOp(left, right, between_parenthesis)
                     else:
                         self.failure()
                         return self.failure()
@@ -994,7 +1024,12 @@ class Builder:
                     right = self.parse_rel_expr()
                     if right:
                         self.success()
-                        left = AndLoOp(left, right)
+                        # check if expr. starts with an open parenthesis '('. Type 43
+                        # check if expr. ends with a cloes parenthesis bracket ')'. Type 44
+                        # Is a hack though as I almost certainly use the wrong function to check it, because I STILL don't understand
+                        # what all the token stream functions and their wrappers actually do
+                        between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                        left = AndLoOp(left, right, between_parenthesis)
                     else:
                         self.failure()
                         return self.failure()
@@ -1017,17 +1052,35 @@ class Builder:
                 if right:
                     self.success()
                     if op == Tokens.LT:
-                        left = LessThanOp(left, right)
+                        # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44 
+                        # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                        between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                        left = LessThanOp(left, right, between_parenthesis)
                     elif op == Tokens.GT:
-                        left = GreaterThanOp(left, right)
+                        # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44 
+                        # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                        between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                        left = GreaterThanOp(left, right, between_parenthesis)
                     elif op == Tokens.LTEQ:
-                        left = LessOrEqThanOp(left, right)
+                        # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                        # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                        between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                        left = LessOrEqThanOp(left, right, between_parenthesis)
                     elif op == Tokens.GTEQ:
-                        left = GreaterOrEqThanOp(left, right)
+                        # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                        # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                        between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                        left = GreaterOrEqThanOp(left, right, between_parenthesis)
                     elif op == Tokens.NEQ:
-                        left = NotEqToOp(left, right)
+                        # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                        # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                        between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                        left = NotEqToOp(left, right, between_parenthesis)
                     elif op == Tokens.EQ:
-                        left = EqToOp(left, right)
+                        # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                        # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                        between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                        left = EqToOp(left, right, between_parenthesis)
                 else:
                     self.failure()
                     return self.failure()
@@ -1048,7 +1101,10 @@ class Builder:
                     right = self.parse_add_expr()
                     if right:
                         self.success()
-                        left = Concat(left, right)
+                        # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                        # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                        between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                        left = Concat(left, right, between_parenthesis)
                     else:
                         self.failure()
                         self.failure()
@@ -1073,9 +1129,15 @@ class Builder:
                     if right:
                         self.success()
                         if op == Tokens.ADD:
-                            left = AddOp(left, right)
+                            # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                            # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                            between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                            left = AddOp(left, right, between_parenthesis)
                         elif op == Tokens.MINUS:
-                            left = SubOp(left, right)
+                            # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                            # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                            between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                            left = SubOp(left, right, between_parenthesis)
                     else:
                         self.failure()
                         return self.failure()
@@ -1102,13 +1164,25 @@ class Builder:
                     if right:
                         self.success()
                         if op == Tokens.MULT:
-                            left = MultOp(left, right)
+                            # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                            # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                            between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                            left = MultOp(left, right, between_parenthesis)
                         elif op == Tokens.DIV:
-                            left = FloatDivOp(left, right)
+                            # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                            # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                            between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                            left = FloatDivOp(left, right, between_parenthesis)
                         elif op == Tokens.MOD:
-                            left = ModOp(left, right)
+                            # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                            # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                            between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                            left = ModOp(left, right, between_parenthesis)
                         elif op == Tokens.FLOOR:
-                            left = FloorDivOp(left, right)
+                            # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                            # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                            between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                            left = FloorDivOp(left, right, between_parenthesis)
                     else:
                         self.failure()
                         return self.failure()
@@ -1136,15 +1210,30 @@ class Builder:
                     if right:
                         self.success()
                         if op == Tokens.BITAND:
-                            left = BAndOp(left, right)
+                            # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                            # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                            between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                            left = BAndOp(left, right, between_parenthesis)
                         elif op == Tokens.BITOR:
-                            left = BOrOp(left, right)
+                            # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                            # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                            between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                            left = BOrOp(left, right, between_parenthesis)
                         elif op == Tokens.BITNOT:
-                            left = BXorOp(left, right)
+                            # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                            # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                            between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                            left = BXorOp(left, right, between_parenthesis)
                         elif op == Tokens.BITRSHIFT:
-                            left = BShiftROp(left, right)
+                            # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                            # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                            between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                            left = BShiftROp(left, right, between_parenthesis)
                         elif op == Tokens.BITRLEFT:
-                            left = BShiftLOp(left, right)
+                            # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                            # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                            between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                            left = BShiftLOp(left, right, between_parenthesis)
                     else:
                         self.failure()
                         return self.failure()
@@ -1203,7 +1292,10 @@ class Builder:
                     right = self.parse_atom()
                     if right:
                         self.success()
-                        left = ExpoOp(left, right)
+                        # check if expr. starts with an open or closed parenthesis: '(' Type 43 or ')' Type 44.
+                        # to see if the binary operator should be in those parenthesis or not. Kinda hacky
+                        between_parenthesis = True if self._stream.LT(1).type == 44 else False 
+                        left = ExpoOp(left, right, between_parenthesis)
                     else:
                         self.failure()
                         return self.failure()

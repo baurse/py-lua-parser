@@ -566,11 +566,11 @@ class BinaryOp(Op):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, name, left: Expression, right: Expression, between_brackets: bool = False):
+    def __init__(self, name, left: Expression, right: Expression, between_parenthesis: bool = False):
         super(BinaryOp, self).__init__(name)
         self.left: Expression = left
         self.right: Expression = right
-        self.between_brackets: bool = between_brackets
+        self.between_parenthesis: bool = between_parenthesis
 
 
 ''' ----------------------------------------------------------------------- '''
@@ -591,8 +591,8 @@ class AddOp(AriOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(AddOp, self).__init__('AddOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(AddOp, self).__init__('AddOp', left, right, between_parenthesis)
 
 
 class SubOp(AriOp):
@@ -603,8 +603,8 @@ class SubOp(AriOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(SubOp, self).__init__('SubOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(SubOp, self).__init__('SubOp', left, right, between_parenthesis)
 
 
 class MultOp(AriOp):
@@ -615,8 +615,8 @@ class MultOp(AriOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(MultOp, self).__init__('MultOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(MultOp, self).__init__('MultOp', left, right, between_parenthesis)
 
 
 class FloatDivOp(AriOp):
@@ -627,8 +627,8 @@ class FloatDivOp(AriOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(FloatDivOp, self).__init__('FloatDivOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(FloatDivOp, self).__init__('FloatDivOp', left, right, between_parenthesis)
 
 
 class FloorDivOp(AriOp):
@@ -639,8 +639,8 @@ class FloorDivOp(AriOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(FloorDivOp, self).__init__('FloorDivOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(FloorDivOp, self).__init__('FloorDivOp', left, right, between_parenthesis)
 
 
 class ModOp(AriOp):
@@ -651,8 +651,8 @@ class ModOp(AriOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(ModOp, self).__init__('ModOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(ModOp, self).__init__('ModOp', left, right, between_parenthesis)
 
 
 class ExpoOp(AriOp):
@@ -663,8 +663,8 @@ class ExpoOp(AriOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(ExpoOp, self).__init__('ExpoOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(ExpoOp, self).__init__('ExpoOp', left, right, between_parenthesis)
 
 
 ''' ----------------------------------------------------------------------- '''
@@ -686,8 +686,8 @@ class BAndOp(BitOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(BAndOp, self).__init__('BAndOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(BAndOp, self).__init__('BAndOp', left, right, between_parenthesis)
 
 
 class BOrOp(BitOp):
@@ -698,8 +698,8 @@ class BOrOp(BitOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(BOrOp, self).__init__('BOrOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(BOrOp, self).__init__('BOrOp', left, right, between_parenthesis)
 
 
 class BXorOp(BitOp):
@@ -710,8 +710,8 @@ class BXorOp(BitOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(BXorOp, self).__init__('BXorOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(BXorOp, self).__init__('BXorOp', left, right, between_parenthesis)
 
 
 class BShiftROp(BitOp):
@@ -722,8 +722,8 @@ class BShiftROp(BitOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(BShiftROp, self).__init__('BShiftROp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(BShiftROp, self).__init__('BShiftROp', left, right, between_parenthesis)
 
 
 class BShiftLOp(BitOp):
@@ -734,8 +734,8 @@ class BShiftLOp(BitOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(BShiftLOp, self).__init__('BShiftLOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(BShiftLOp, self).__init__('BShiftLOp', left, right, between_parenthesis)
 
 
 ''' ----------------------------------------------------------------------- '''
@@ -757,8 +757,8 @@ class LessThanOp(RelOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(LessThanOp, self).__init__('RLtOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(LessThanOp, self).__init__('RLtOp', left, right, between_parenthesis)
 
 
 class GreaterThanOp(RelOp):
@@ -769,8 +769,8 @@ class GreaterThanOp(RelOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(GreaterThanOp, self).__init__('RGtOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(GreaterThanOp, self).__init__('RGtOp', left, right, between_parenthesis)
 
 
 class LessOrEqThanOp(RelOp):
@@ -781,8 +781,8 @@ class LessOrEqThanOp(RelOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(LessOrEqThanOp, self).__init__('RLtEqOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(LessOrEqThanOp, self).__init__('RLtEqOp', left, right, between_parenthesis)
 
 
 class GreaterOrEqThanOp(RelOp):
@@ -793,8 +793,8 @@ class GreaterOrEqThanOp(RelOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(GreaterOrEqThanOp, self).__init__('RGtEqOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(GreaterOrEqThanOp, self).__init__('RGtEqOp', left, right, between_parenthesis)
 
 
 class EqToOp(RelOp):
@@ -805,8 +805,8 @@ class EqToOp(RelOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(EqToOp, self).__init__('REqOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(EqToOp, self).__init__('REqOp', left, right, between_parenthesis)
 
 
 class NotEqToOp(RelOp):
@@ -817,8 +817,8 @@ class NotEqToOp(RelOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(NotEqToOp, self).__init__('RNotEqOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(NotEqToOp, self).__init__('RNotEqOp', left, right, between_parenthesis)
 
 
 ''' ----------------------------------------------------------------------- '''
@@ -840,8 +840,8 @@ class AndLoOp(LoOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(AndLoOp, self).__init__('LAndOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(AndLoOp, self).__init__('LAndOp', left, right, between_parenthesis)
 
 
 class OrLoOp(LoOp):
@@ -852,8 +852,8 @@ class OrLoOp(LoOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(OrLoOp, self).__init__('LOrOp', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(OrLoOp, self).__init__('LOrOp', left, right, between_parenthesis)
 
 
 ''' ----------------------------------------------------------------------- '''
@@ -869,8 +869,8 @@ class Concat(BinaryOp):
         right (`Expression`): Right expression.
     """
 
-    def __init__(self, left: Expression, right: Expression, between_brackets: bool = False):
-        super(Concat, self).__init__('Concat', left, right, between_brackets)
+    def __init__(self, left: Expression, right: Expression, between_parenthesis: bool = False):
+        super(Concat, self).__init__('Concat', left, right, between_parenthesis)
 
 
 ''' ----------------------------------------------------------------------- '''

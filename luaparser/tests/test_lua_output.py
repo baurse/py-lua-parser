@@ -31,6 +31,11 @@ class LuaOutputTestCase(tests.TestCase):
             a = b + c''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
+    def test_many_add_op(self):
+        source = textwrap.dedent('''\
+            a = b + c + d + e''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
     def test_sub_op(self):
         source = textwrap.dedent('''\
             a = b - c''')
@@ -131,49 +136,100 @@ class LuaOutputTestCase(tests.TestCase):
             a = b <= c''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
-    @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
-    def test_add_in_bracket(self):
+    def test_or_in_parenthesis(self):
         source = textwrap.dedent('''\
-            a = (qx + qw)''')
+            a = (qx or qw)''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
-    @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
-    def test_multiply_bracket_right(self):
+    def test_or_in_parenthesis_with_spaces(self):
+        source = textwrap.dedent('''\
+            a = (  qx or qw        )''')
+        exp = textwrap.dedent('''\
+            a = (qx or qw)''')
+        self.assertEqual(exp, ast.to_lua_source(ast.parse(source)))
+
+    def test_or_with_some_parenthesis_1(self):
+        source = textwrap.dedent('''\
+            a = (qx or qw) or qz''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_or_with_some_parenthesis_2(self):
+        source = textwrap.dedent('''\
+            a = qx or (qw or qz)''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_or_with_some_parenthesis_3(self):
+        source = textwrap.dedent('''\
+            a = (qx or (qw or qz))''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_or_with_some_parenthesis_4(self):
+        source = textwrap.dedent('''\
+            a = (qx or qy or (qw or qz))''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_or_with_some_parenthesis_5(self):
+        source = textwrap.dedent('''\
+            a = (qx or qy or (qw or qz)) or b''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_or_with_some_parenthesis_6(self):
+        source = textwrap.dedent('''\
+            a = (qx or qy or (qw or qz)) or (b or c) or (d or e) or f''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_and_in_parenthesis(self):
+        source = textwrap.dedent('''\
+            a = (qx and qy)''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_and_or_with_some_parenthesis_1(self):
+        source = textwrap.dedent('''\
+            a = (qx and qy or (qw and qz))''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_and_or_with_some_parenthesis_2(self):
+        source = textwrap.dedent('''\
+            a = qx and (qy or (qw and qz))''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    # @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
+    def test_multiply_parenthesis_right(self):
         source = textwrap.dedent('''\
             a = k * (qx + qw)''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
-    @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
-    def test_multiply_bracket_left(self):
+    # @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
+    def test_multiply_parenthesis_left(self):
         source = textwrap.dedent('''\
             a = (k + j) * qx''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
-    @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
-    def test_multiply_bracket_both(self):
+    # @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
+    def test_multiply_parenthesis_both(self):
         source = textwrap.dedent('''\
             a = (k + j) * (qx + qw)''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
-    @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
-    def test_divide_bracket_right(self):
+    # @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
+    def test_divide_parenthesis_right(self):
         source = textwrap.dedent('''\
             a = k / (qx + qw)''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
-    @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
-    def test_divide_bracket_left(self):
+    # @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
+    def test_divide_parenthesis_left(self):
         source = textwrap.dedent('''\
             a = (k + j) / qx''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
-    @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
-    def test_divide_bracket_both(self):
+    # @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
+    def test_divide_parenthesis_both(self):
         source = textwrap.dedent('''\
             a = (k + j) / (qx + qw)''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
-    @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
+    # @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
     def test_greater_than_bracketed_add(self):
         source = textwrap.dedent('''\
             if a > (qx + qw) then
@@ -181,7 +237,7 @@ class LuaOutputTestCase(tests.TestCase):
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
-    @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
+    # @unittest.skip('Fails currently cause bracketed operators are not yet read correctly')
     def test_negated_bracketed_add(self):
         source = textwrap.dedent('''\
             a = -(a + b)''')
@@ -263,6 +319,24 @@ class LuaOutputTestCase(tests.TestCase):
             end''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
     
+    def test_if_in_parenthesis(self):
+        source = textwrap.dedent('''\
+            if (op == "+") then
+                r = a + b
+            end''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_if_in_too_many_parenthesis(self):
+        source = textwrap.dedent('''\
+            if ((op == "+")) then
+                r = a + b
+            end''')
+        exp = textwrap.dedent('''\
+            if (op == "+") then
+                r = a + b
+            end''')
+        self.assertEqual(exp, ast.to_lua_source(ast.parse(source)))
+
     def test_goto(self):
         source = textwrap.dedent('''\
             ::label::
@@ -356,6 +430,43 @@ class LuaOutputTestCase(tests.TestCase):
     def test_call(self):
         source = textwrap.dedent('''\
             call("foo")''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_op_in_call(self):
+        source = textwrap.dedent('''\
+            call(a or b)''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_call_with_op_in_parenthesis_1(self):
+        source = textwrap.dedent('''\
+            call(a + ((b or c) and x))''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_call_with_op_in_parenthesis_2(self):
+        source = textwrap.dedent('''\
+            call(foo, b or c)''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_call_with_op_in_parenthesis_3(self):
+        source = textwrap.dedent('''\
+            call(foo, a + ((b or c) and x))''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_call_with_op_in_parenthesis_4(self):
+        source = textwrap.dedent('''\
+            call(foo, (a + ((b or c) and x)))''')
+        exp = textwrap.dedent('''\
+            call(foo, a + ((b or c) and x))''')
+        self.assertEqual(exp, ast.to_lua_source(ast.parse(source)))
+
+    def test_invoke_with_op_in_parenthesis_2(self):
+        source = textwrap.dedent('''\
+            invoke:me(foo, a + ((b or c) and x))''')
+        self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
+
+    def test_invoke_with_op_in_parenthesis_1(self):
+        source = textwrap.dedent('''\
+            invoke:me(a or b)''')
         self.assertEqual(source, ast.to_lua_source(ast.parse(source)))
 
     def test_invoke(self):

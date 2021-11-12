@@ -222,7 +222,8 @@ class StatementsTestCase(tests.TestCase):
             If(
                 test=LessThanOp(
                     left=Name('a'),
-                    right=Number(2)
+                    right=Number(2),
+                    between_parenthesis=True
                 ),
                 body=Block([]),
                 orelse=None

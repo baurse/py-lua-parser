@@ -537,103 +537,19 @@ class LuaOutputVisitor:
 
     @visitor(BinaryOp)
     def visit(self, node: BinaryOp) -> str:
-        possible_bracket = '(' if node.between_brackets else ''
+        if node.between_parenthesis:
+            left_bracket = '('
+            right_bracket = ')'
+        else:
+            left_bracket = ''
+            right_bracket = ''     
         operator = display_name_to_printable_literal_name[node.display_name]
         
-        output = possible_bracket
-        output += self.visit(node.left)
-        output += ' ' + operator + ' '
-        output += self.visit(node.right)
-        output += possible_bracket
+        output = left_bracket
+        output += self.visit(node.left) + ' ' + operator + ' ' + self.visit(node.right)
+        output += right_bracket
         return output
     
-    # @visitor(AddOp)
-    # def visit(self, node: AddOp) -> str:
-    #     output = '(' if node.between_brackets else ''
-    #     output += self.visit(node.left) + ' + ' + self.visit(node.right)
-    #     output += ')' if node.between_brackets else ''
-    #     return output
-
-    # @visitor(SubOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' - ' + self.visit(node.right)
-
-    # @visitor(MultOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' * ' + self.visit(node.right)
-
-    # @visitor(FloatDivOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' / ' + self.visit(node.right)
-
-    # @visitor(FloorDivOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' // ' + self.visit(node.right)
-
-    # @visitor(ModOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' % ' + self.visit(node.right)
-
-    # @visitor(ExpoOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' ^ ' + self.visit(node.right)
-
-    # @visitor(BAndOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' & ' + self.visit(node.right)
-
-    # @visitor(BOrOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' | ' + self.visit(node.right)
-
-    # @visitor(BXorOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' ~ ' + self.visit(node.right)
-
-    # @visitor(BShiftROp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' >> ' + self.visit(node.right)
-
-    # @visitor(BShiftLOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' << ' + self.visit(node.right)
-
-    # @visitor(LessThanOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' < ' + self.visit(node.right)
-
-    # @visitor(GreaterThanOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' > ' + self.visit(node.right)
-
-    # @visitor(LessOrEqThanOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' <= ' + self.visit(node.right)
-
-    # @visitor(GreaterOrEqThanOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' >= ' + self.visit(node.right)
-
-    # @visitor(EqToOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' == ' + self.visit(node.right)
-
-    # @visitor(NotEqToOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' ~= ' + self.visit(node.right)
-
-    # @visitor(AndLoOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' and ' + self.visit(node.right)
-
-    # @visitor(OrLoOp)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + ' or ' + self.visit(node.right)
-
-    # @visitor(Concat)
-    # def visit(self, node) -> str:
-    #     return self.visit(node.left) + '..' + self.visit(node.right)
-
     @visitor(UMinusOp)
     def visit(self, node) -> str:
         return '-' + self.visit(node.operand)
